@@ -68,9 +68,9 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .ba-after img{position:absolute;top:0;left:0;width:100%;max-width:820px;height:100%;object-fit:cover}
 .ba-divider{position:absolute;top:0;bottom:0;left:50%;transform:translateX(-50%);width:2px;background:var(--gold);z-index:10}
 .ba-handle{display: none !important;}
-.ba-handle svg{display: none !important;}
+.ba-handle svg{width:20px;height:20px;fill:#0D0D0D}
 .ba-tag{position:absolute;top:16px;padding:6px 14px;border-radius:100px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;z-index:5}
-.ba-tag.before{display: none !important;}
+.ba-tag.before{left:16px;background:rgba(0,0,0,.6);color:var(--muted);border:1px solid var(--border)}
 .ba-tag.after{right:16px;background:rgba(201,169,110,.15);color:var(--gold);border:1px solid rgba(201,169,110,.3)}
 
 /* Make BA slider show placeholder gradient when no real image */
@@ -263,7 +263,6 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 <!-- BEFORE/AFTER -->
 <section class="slider-section">
   <p class="slider-label reveal" data-en="Before & after — drag to compare" data-vi="Trước &amp; sau retouch — kéo để so sánh">Before &amp; after — drag to compare</p>
-  
   <div class="ba-container reveal" id="baContainer">
     <img class="ba-img" src="images/tambefore.jpg" alt="Original unedited photo">
     <div class="ba-after" id="baAfter">
