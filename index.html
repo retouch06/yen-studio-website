@@ -69,6 +69,7 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .ba-divider{display: none !important;}
 .ba-handle{display: none !important;}
 .ba-handle svg{display: none !important;}
+/* Style chung cho nhãn */
 .ba-tag {
     position: absolute;
     top: 16px;
@@ -80,19 +81,19 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
     font-size: 11px;
     letter-spacing: .1em;
     text-transform: uppercase;
+    white-space: nowrap;
+    z-index: 10; /* Đảm bảo chữ luôn nằm trên ảnh */
 }
 
-/* Ép nhãn Before đứng im bên góc trái */
+/* Cố định BEFORE ở góc trái */
 .ba-tag.before {
     left: 16px;
-    z-index: 4;
 }
 
-/* Ép nhãn After bám sát lề phải của khối trượt (chính là thanh ở giữa) */
+/* Cố định AFTER ở chính giữa ảnh */
 .ba-tag.after {
-    right: 16px; 
-    z-index: 6;
-    white-space: nowrap;
+    left: 50%;
+    transform: translateX(-50%); /* Kỹ thuật căn giữa chuẩn xác */
 }
 /* Make BA slider show placeholder gradient when no real image */
 .ba-before-fill{position:absolute;inset:0;background:linear-gradient(135deg,#1a1410 0%,#2d2015 50%,#1a1410 100%)}
@@ -280,19 +281,8 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
     <span data-en="Scroll" data-vi="Kéo xuống">Scroll</span>
   </div>
 </section>
-
-<!-- BEFORE/AFTER -->
-<section class="slider-section">
-  <div style="text-align: center; font-family: 'Playfair Display', serif; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; font-size: 14px; text-transform: uppercase;">
-    BEFORE / AFTER
-</div>
-  <div class="ba-container reveal" id="baContainer">
-    <img class="ba-img" src="images/tambefore.jpg" alt="Original unedited photo">
-    <div class="ba-after" id="baAfter">
-      <div style="position:absolute;inset:0">
-        <img src="images/tamafter.jpg" alt="Retouched photo" style="position:absolute;top:0;left:0;width:820px;max-width:none;height:100%;object-fit:cover">
-      </div>
-    </div>
+<div class="ba-tag before">BEFORE</div>
+<div class="ba-tag after">AFTER</div>
    <div class="ba-tag before">BEFORE</div>
 <script>
     // Đoạn code nhỏ này sẽ tự động chèn chữ AFTER vào đúng vị trí cần thiết bên trong baAfter
@@ -722,7 +712,6 @@ function handleSubmit(){
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const containers = document.querySelectorAll('.ba-container');
-
     containers.forEach(container => {
         const afterSection = container.querySelector('.ba-after');
         if (!afterSection) return;
@@ -732,11 +721,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setInterval(() => {
             progress += direction * 0.4; 
-            if (progress >= 100) {
-                direction = -1;
-            } else if (progress <= 0) {
-                direction = 1;
-            }
+            if (progress >= 100 || progress <= 0) direction *= -1;
             afterSection.style.width = `${progress}%`;
         }, 20);
     });
