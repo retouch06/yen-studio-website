@@ -69,10 +69,20 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .ba-divider{display: none !important;}
 .ba-handle{display: none !important;}
 .ba-handle svg{display: none !important;}
-.ba-tag{position:absolute;top:16px;padding:6px 14px;border-radius:100px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;z-index:5}
-.ba-tag.before{display: none !important;}
-.ba-tag.after{right:16px;background:rgba(201,169,110,.15);color:var(--gold);border:1px solid rgba(201,169,110,.3)}
-
+.ba-tag {
+    position: absolute;
+    top: 16px;
+    left: 16px; /* Cố định nhãn luôn nằm bên góc trái ảnh */
+    background: rgba(201, 169, 110, .15);
+    color: var(--gold);
+    border: 1px solid rgba(201, 169, 110, .3);
+    padding: 6px 14px;
+    border-radius: 100px;
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    z-index: 5;
+}
 /* Make BA slider show placeholder gradient when no real image */
 .ba-before-fill{position:absolute;inset:0;background:linear-gradient(135deg,#1a1410 0%,#2d2015 50%,#1a1410 100%)}
 .ba-after-fill{position:absolute;inset:0;background:linear-gradient(135deg,#0d0d0d 0%,#1a1410 40%,#2a1d0e 100%)}
@@ -262,8 +272,8 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 
 <!-- BEFORE/AFTER -->
 <section class="slider-section">
-  <div id="dynamic-label" style="text-align: left; padding-left: 5px; font-family: 'Playfair Display', serif; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; font-size: 14px; text-transform: uppercase;">
-    BEFORE
+  <div style="text-align: center; font-family: 'Playfair Display', serif; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; font-size: 14px; text-transform: uppercase;">
+    BEFORE / AFTER
 </div>
   <div class="ba-container reveal" id="baContainer">
     <img class="ba-img" src="images/tambefore.jpg" alt="Original unedited photo">
@@ -272,8 +282,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
         <img src="images/tamafter.jpg" alt="Retouched photo" style="position:absolute;top:0;left:0;width:820px;max-width:none;height:100%;object-fit:cover">
       </div>
     </div>
-    <div class="ba-tag before" data-en="Before" data-vi="Trước">Before</div>
-    <div class="ba-tag after" data-en="After" data-vi="Sau">After</div>
+    <div id="image-tag" class="ba-tag">AFTER</div>
     <div class="ba-divider" id="baDivider">
       <div class="ba-handle">
         <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
@@ -690,33 +699,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     containers.forEach(container => {
         const afterSection = container.querySelector('.ba-after');
-        // Tìm đến dòng chữ BEFORE / AFTER nằm ngay phía trên khung ảnh để điều khiển nó
-        const dynamicLabel = container.previousElementSibling; 
+        // Tìm đúng cái tag nằm TRONG khung ảnh bằng ID vừa tạo ở Bước 1
+        const tag = container.querySelector('#image-tag'); 
         if (!afterSection) return;
 
         let direction = 1;
-        let progress = 50;
+        let progress = 50; 
 
         setInterval(() => {
-            // Tăng/giảm tiến trình quét ảnh
             progress += direction * 0.4; 
-            
-            // Cho phép quét kịch biên từ 0% đến 100% toàn bộ bức ảnh
             if (progress >= 100) {
                 direction = -1;
             } else if (progress <= 0) {
                 direction = 1;
             }
             
-            // Cập nhật chiều rộng ảnh đè lên
             afterSection.style.width = `${progress}%`;
 
-            // Tự động đổi chữ ở giữa dựa theo hướng quét của ảnh
-            if (dynamicLabel) {
+            // Logic đổi chữ trong ảnh:
+            // Khi progress > 50 (ảnh After chiếm đa số) -> Hiện chữ AFTER ở góc trái
+            // Khi progress <= 50 (ảnh Before lộ ra) -> Tự đổi thành chữ BEFORE ở góc trái
+            if (tag) {
                 if (progress > 50) {
-                    dynamicLabel.innerText = "BEFORE";
+                    tag.innerText = "AFTER";
                 } else {
-                    dynamicLabel.innerText = "AFTER";
+                    tag.innerText = "BEFORE";
                 }
             }
         }, 20);
