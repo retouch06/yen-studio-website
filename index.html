@@ -683,5 +683,44 @@ function handleSubmit(){
   setTimeout(()=>{btn.textContent='Đã gửi! Mình sẽ liên hệ sớm ✓';btn.style.background='#2a5a2a';},1200);
 }
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Tìm tất cả các thanh trượt Before/After trên trang
+    const sliders = document.querySelectorAll('.slider-wrapper'); // Hoặc đổi thành lớp CSS thanh trượt của bạn
+
+    sliders.forEach(slider => {
+        const handle = slider.querySelector('.slider-handle') || slider.querySelector('input[type="range"]');
+        const afterImg = slider.querySelector('.after-image') || slider.querySelectorAll('img')[1];
+        
+        if (!afterImg) return;
+
+        let direction = 1; // 1 là trượt sang phải, -1 là trượt sang trái
+        let progress = 50; // Bắt đầu từ giữa (50%)
+
+        // Hàm chạy tự động liên tục
+        setInterval(() => {
+            // Mỗi nhịp cộng/trừ tiến trình để tạo hiệu ứng mượt mà
+            progress += direction * 0.5; 
+
+            // Nếu chạm mốc 90% thì đổi chiều trượt về, chạm 10% thì lại trượt đi
+            if (progress >= 90) {
+                direction = -1;
+            } else if (progress <= 10) {
+                direction = 1;
+            }
+
+            // Cập nhật giao diện (áp dụng cho cả ảnh và thanh kéo)
+            afterImg.style.clipPath = `polygon(${progress}% 0, 100% 0, 100% 100%, ${progress}% 100%)`;
+            if (handle) {
+                if (handle.tagName === 'INPUT') {
+                    handle.value = progress;
+                } else {
+                    handle.style.left = `${progress}%`;
+                }
+            }
+        }, 30); // Chạy mỗi 30ms để hiệu ứng trượt mượt mà lặp đi lặp lại tầm 2-3s một chu kỳ
+    });
+});
+</script>
 </body>
 </html>
