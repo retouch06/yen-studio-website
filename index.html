@@ -69,7 +69,6 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .ba-divider{display: none !important;}
 .ba-handle{display: none !important;}
 .ba-handle svg{display: none !important;}
-/* Dòng 72 - 86: Định dạng chung cho nhãn */
 .ba-tag {
     position: absolute;
     top: 16px;
@@ -81,18 +80,19 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
     font-size: 11px;
     letter-spacing: .1em;
     text-transform: uppercase;
-    z-index: 10;
-    white-space: nowrap;
-}
-/* Dòng 87 - 90: Cố định BEFORE ở góc trái */
-.ba-tag.before {
-    left: 16px;
 }
 
-/* Dòng 93 - 96: Cố định AFTER ở chính giữa ảnh */
+/* Ép nhãn Before đứng im bên góc trái */
+.ba-tag.before {
+    left: 16px;
+    z-index: 4;
+}
+
+/* Ép nhãn After bám sát lề phải của khối trượt (chính là thanh ở giữa) */
 .ba-tag.after {
-    left: 50%;
-    transform: translateX(-50%); /* Kỹ thuật căn giữa chính xác */
+    right: 16px; 
+    z-index: 6;
+    white-space: nowrap;
 }
 /* Make BA slider show placeholder gradient when no real image */
 .ba-before-fill{position:absolute;inset:0;background:linear-gradient(135deg,#1a1410 0%,#2d2015 50%,#1a1410 100%)}
@@ -280,19 +280,40 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
     <span data-en="Scroll" data-vi="Kéo xuống">Scroll</span>
   </div>
 </section>
-<div class="ba-tag before">BEFORE</div>
-<div class="ba-tag after">AFTER</div>
-<div class="ba-container reveal" id="baContainer">
-    <img class="ba-img" src="images/tambefore.jpg" alt="Original">
-    <div class="ba-after" id="baAfter">
-        <img src="images/tamafter.jpg" alt="Retouched" style="width:820px;height:100%;object-fit:cover">
-    </div>
-    <div class="ba-divider" id="baDivider">
-        <div class="ba-handle">
-            <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
-        </div>
-    </div>
+
+<!-- BEFORE/AFTER -->
+<section class="slider-section">
+  <div style="text-align: center; font-family: 'Playfair Display', serif; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; font-size: 14px; text-transform: uppercase;">
+    BEFORE / AFTER
 </div>
+  <div class="ba-container reveal" id="baContainer">
+    <img class="ba-img" src="images/tambefore.jpg" alt="Original unedited photo">
+    <div class="ba-after" id="baAfter">
+      <div style="position:absolute;inset:0">
+        <img src="images/tamafter.jpg" alt="Retouched photo" style="position:absolute;top:0;left:0;width:820px;max-width:none;height:100%;object-fit:cover">
+      </div>
+    </div>
+   <div class="ba-tag before">BEFORE</div>
+<script>
+    // Đoạn code nhỏ này sẽ tự động chèn chữ AFTER vào đúng vị trí cần thiết bên trong baAfter
+    document.addEventListener("DOMContentLoaded", () => {
+        const baAfter = document.getElementById("baAfter");
+        if (baAfter) {
+            const innerDiv = baAfter.querySelector('div');
+            if (innerDiv) {
+                const afterTag = document.createElement('div');
+                afterTag.className = 'ba-tag after';
+                afterTag.innerText = 'AFTER';
+                innerDiv.appendChild(afterTag);
+            }
+        }
+    });
+</script>
+    <div class="ba-divider" id="baDivider">
+      <div class="ba-handle">
+        <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -701,8 +722,11 @@ function handleSubmit(){
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const containers = document.querySelectorAll('.ba-container');
+
     containers.forEach(container => {
         const afterSection = container.querySelector('.ba-after');
+        // Tìm đúng cái tag nằm TRONG khung ảnh bằng ID vừa tạo ở Bước 1
+        const tag = container.querySelector('#image-tag'); 
         if (!afterSection) return;
 
         let direction = 1;
@@ -710,8 +734,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setInterval(() => {
             progress += direction * 0.4; 
-            if (progress >= 100 || progress <= 0) direction *= -1;
+            if (progress >= 100) {
+                direction = -1;
+            } else if (progress <= 0) {
+                direction = 1;
+            }
+            
             afterSection.style.width = `${progress}%`;
+
+            // Logic đổi chữ trong ảnh:
+            // Khi progress > 50 (ảnh After chiếm đa số) -> Hiện chữ AFTER ở góc trái
+            // Khi progress <= 50 (ảnh Before lộ ra) -> Tự đổi thành chữ BEFORE ở góc trái
+            if (tag) {
+                if (progress > 50) {
+                    tag.innerText = "AFTER";
+                } else {
+                    tag.innerText = "BEFORE";
+                }
+            }
         }, 20);
     });
 });
