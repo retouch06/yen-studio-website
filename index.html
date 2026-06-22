@@ -69,7 +69,7 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .ba-divider{display: none !important;}
 .ba-handle{display: none !important;}
 .ba-handle svg{display: none !important;}
-/* Style chung cho nhãn */
+/* Dòng 72 - 86: Định dạng chung cho nhãn */
 .ba-tag {
     position: absolute;
     top: 16px;
@@ -81,19 +81,18 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
     font-size: 11px;
     letter-spacing: .1em;
     text-transform: uppercase;
+    z-index: 10;
     white-space: nowrap;
-    z-index: 10; /* Đảm bảo chữ luôn nằm trên ảnh */
 }
-
-/* Cố định BEFORE ở góc trái */
+/* Dòng 87 - 90: Cố định BEFORE ở góc trái */
 .ba-tag.before {
     left: 16px;
 }
 
-/* Cố định AFTER ở chính giữa ảnh */
+/* Dòng 93 - 96: Cố định AFTER ở chính giữa ảnh */
 .ba-tag.after {
     left: 50%;
-    transform: translateX(-50%); /* Kỹ thuật căn giữa chuẩn xác */
+    transform: translateX(-50%); /* Kỹ thuật căn giữa chính xác */
 }
 /* Make BA slider show placeholder gradient when no real image */
 .ba-before-fill{position:absolute;inset:0;background:linear-gradient(135deg,#1a1410 0%,#2d2015 50%,#1a1410 100%)}
@@ -283,27 +282,17 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 </section>
 <div class="ba-tag before">BEFORE</div>
 <div class="ba-tag after">AFTER</div>
-   <div class="ba-tag before">BEFORE</div>
-<script>
-    // Đoạn code nhỏ này sẽ tự động chèn chữ AFTER vào đúng vị trí cần thiết bên trong baAfter
-    document.addEventListener("DOMContentLoaded", () => {
-        const baAfter = document.getElementById("baAfter");
-        if (baAfter) {
-            const innerDiv = baAfter.querySelector('div');
-            if (innerDiv) {
-                const afterTag = document.createElement('div');
-                afterTag.className = 'ba-tag after';
-                afterTag.innerText = 'AFTER';
-                innerDiv.appendChild(afterTag);
-            }
-        }
-    });
-</script>
-    <div class="ba-divider" id="baDivider">
-      <div class="ba-handle">
-        <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
-      </div>
+<div class="ba-container reveal" id="baContainer">
+    <img class="ba-img" src="images/tambefore.jpg" alt="Original">
+    <div class="ba-after" id="baAfter">
+        <img src="images/tamafter.jpg" alt="Retouched" style="width:820px;height:100%;object-fit:cover">
     </div>
+    <div class="ba-divider" id="baDivider">
+        <div class="ba-handle">
+            <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
+        </div>
+    </div>
+</div>
   </div>
 </section>
 
