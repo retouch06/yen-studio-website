@@ -262,8 +262,8 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 
 <!-- BEFORE/AFTER -->
 <section class="slider-section">
-  <div style="text-align: center; font-family: 'Playfair Display', serif; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; font-size: 14px; text-transform: uppercase;">
-    BEFORE / AFTER
+  <div id="dynamic-label" style="text-align: left; padding-left: 5px; font-family: 'Playfair Display', serif; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; font-size: 14px; text-transform: uppercase;">
+    BEFORE
 </div>
   <div class="ba-container reveal" id="baContainer">
     <img class="ba-img" src="images/tambefore.jpg" alt="Original unedited photo">
@@ -686,36 +686,40 @@ function handleSubmit(){
 </script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    // Tìm tất cả các thanh trượt Before/After (.ba-container) trên trang
     const containers = document.querySelectorAll('.ba-container');
 
     containers.forEach(container => {
         const afterSection = container.querySelector('.ba-after');
-        const handle = container.querySelector('.ba-handle');
-        
-        if (!afterSection || !handle) return;
+        // Tìm đến dòng chữ BEFORE / AFTER nằm ngay phía trên khung ảnh để điều khiển nó
+        const dynamicLabel = container.previousElementSibling; 
+        if (!afterSection) return;
 
-        let direction = 1;   // 1 là trượt sang phải, -1 là trượt sang trái
-        let progress = 50;   // Bắt đầu từ vị trí chính giữa (50%)
+        let direction = 1;
+        let progress = 50;
 
-        // Hàm chạy tự động liên tục
         setInterval(() => {
-            // Thay đổi tiến trình chậm hay nhanh bằng cách chỉnh số 0.3 (số nhỏ chạy mượt và chậm hơn)
-            progress += direction * 0.3; 
-
-            // Nếu chạm mốc 85% thì đổi chiều trượt về, chạm 15% thì lại trượt đi
-            if (progress >= 85) {
+            // Tăng/giảm tiến trình quét ảnh
+            progress += direction * 0.4; 
+            
+            // Cho phép quét kịch biên từ 0% đến 100% toàn bộ bức ảnh
+            if (progress >= 100) {
                 direction = -1;
-            } else if (progress <= 15) {
+            } else if (progress <= 0) {
                 direction = 1;
             }
-
-            // Điều khiển độ rộng ảnh After (sử dụng width% theo đúng thuộc tính của CSS dòng 68)
-            afterSection.style.width = `${progress}%`;
             
-            // Điều khiển thanh kéo ở giữa chạy theo (sử dụng left% theo đúng CSS dòng 71)
-            handle.style.left = `${progress}%`;
-        }, 20); // Chạy liên tục mỗi 20 mili-giây để hiệu ứng trượt êm ái, mượt mà nhất
+            // Cập nhật chiều rộng ảnh đè lên
+            afterSection.style.width = `${progress}%`;
+
+            // Tự động đổi chữ ở giữa dựa theo hướng quét của ảnh
+            if (dynamicLabel) {
+                if (progress > 50) {
+                    dynamicLabel.innerText = "BEFORE";
+                } else {
+                    dynamicLabel.innerText = "AFTER";
+                }
+            }
+        }, 20);
     });
 });
 </script>
