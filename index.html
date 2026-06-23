@@ -796,7 +796,7 @@ async function handleSubmit(){
     document.getElementById('f-service').selectedIndex=0;
     ['f-day','f-month','f-year'].forEach(id=>{document.getElementById(id).selectedIndex=0;});
     // Send email notification
-    fetch('https://lrkmmjcqsfyqiijwuwgb.supabase.co/functions/v1/notify-new-order',{
+    fetch('https://lrkmmjcqsfyqiijwuwgb.supabase.co/functions/v1/hyper-task',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg'},
       body:JSON.stringify({name,email,phone,service,photos,deadline,message})
