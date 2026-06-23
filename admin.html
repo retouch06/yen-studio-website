@@ -25,7 +25,7 @@
 <body>
 <div id="lockScreen">
   <div class="lock-box">
-    <div class="lock-logo">Prime<span>.</span>Touch</div>
+    <div class="lock-logo">Prime Touch</div>
     <div class="lock-sub">Enter admin password to continue</div>
     <input type="password" id="pwInput" class="lock-input" placeholder="Password" autofocus>
     <button class="lock-btn" onclick="checkPassword()">Unlock</button>
@@ -258,7 +258,7 @@ function Sidebar({ view, setView }) {
   return (
     <aside style={S.sidebar}>
       <div style={S.logo}>
-        Prime<span style={{ color: 'var(--gold)' }}>.</span>Touch
+        Prime Touch
       </div>
       <nav style={S.nav}>
         <SidebarItem active={view === 'orders'} onClick={() => setView('orders')} label="Orders" icon={<IconOrders />} />
