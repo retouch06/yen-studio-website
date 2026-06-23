@@ -217,7 +217,7 @@ function App() {
 
   if (!auth) return (
     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 32 }}>
-      <div style={{ fontFamily: 'Playfair Display', fontSize: 28, color: '#C9A96E', letterSpacing: '0.05em' }}>Prime<span style={{ color: '#F0EDE8' }}>.Touch</span></div>
+      <div style={{ fontFamily: 'Playfair Display', fontSize: 28, color: '#F0EDE8', letterSpacing: '0.05em' }}>Prime Touch</div>
       <div style={{ background: '#111', padding: '32px 40px', width: 320 }}>
         <div style={{ fontSize: 13, color: '#888', marginBottom: 20, textAlign: 'center', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Admin access</div>
         <input type="password" value={pw} onChange={e => setPw(e.target.value)} onKeyDown={e => e.key === 'Enter' && tryLogin()} placeholder="Password" style={{ width: '100%', marginBottom: 12, border: pwErr ? '1px solid #E07070' : '1px solid #2a2a2a', transition: 'border-color 0.2s' }} autoFocus />
@@ -232,7 +232,7 @@ function App() {
       {/* Sidebar */}
       <div style={{ width: 200, background: '#0a0a0a', borderRight: '1px solid #1a1a1a', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid #1a1a1a' }}>
-          <div style={{ fontFamily: 'Playfair Display', fontSize: 18, color: '#C9A96E', letterSpacing: '0.05em' }}>Prime<span style={{ color: '#F0EDE8' }}>.Touch</span></div>
+          <div style={{ fontFamily: 'Playfair Display', fontSize: 18, color: '#F0EDE8', letterSpacing: '0.05em' }}>Prime Touch</div>
           <div style={{ fontSize: 10, color: '#333', marginTop: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Admin</div>
         </div>
         <nav style={{ padding: '12px 10px', flex: 1 }}>
