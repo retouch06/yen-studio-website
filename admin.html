@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Prime Touch</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>body{margin:0;background:#0D0D0D}
+#lockScreen{position:fixed;inset:0;background:#0D0D0D;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'Inter',sans-serif}
+#lockScreen.hidden{display:none}
+.lock-box{width:320px;text-align:center}
+.lock-logo{font-family:'Playfair Display',serif;font-size:24px;color:#F0EDE8;margin-bottom:8px}
+.lock-logo span{color:#C9A96E}
+.lock-sub{font-size:13px;color:#888580;margin-bottom:28px}
+.lock-input{width:100%;background:#161616;border:1px solid #2A2A2A;border-radius:8px;padding:12px 16px;color:#F0EDE8;font-size:14px;outline:none;text-align:center;letter-spacing:0.1em;box-sizing:border-box}
+.lock-input:focus{border-color:#C9A96E}
+.lock-btn{width:100%;background:#C9A96E;color:#0D0D0D;border:none;border-radius:8px;padding:12px;font-size:14px;font-weight:500;cursor:pointer;margin-top:12px;font-family:inherit}
+.lock-btn:hover{background:#E8C98A}
+.lock-error{color:#E07856;font-size:12px;margin-top:10px;height:14px}
+</style>
+</head>
+<body>
+<div id="lockScreen">
+  <div class="lock-box">
+    <div class="lock-logo">Prime<span>.</span>Touch</div>
+    <div class="lock-sub">Enter admin password to continue</div>
+    <input type="password" id="pwInput" class="lock-input" placeholder="Password" autofocus>
+    <button class="lock-btn" onclick="checkPassword()">Unlock</button>
+    <div class="lock-error" id="pwError"></div>
+  </div>
+</div>
+<div id="root"></div>
+<script>
+  const ADMIN_PASSWORD = "primetouch2026";
+  const SESSION_KEY = "pt_admin_unlocked";
+
+  function checkPassword(){
+    const val = document.getElementById('pwInput').value;
+    if (val === ADMIN_PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, "1");
+      document.getElementById('lockScreen').classList.add('hidden');
+    } else {
+      document.getElementById('pwError').textContent = "Incorrect password";
+      document.getElementById('pwInput').value = "";
+    }
+  }
+  document.getElementById('pwInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkPassword();
+  });
+  if (sessionStorage.getItem(SESSION_KEY) === "1") {
+    document.getElementById('lockScreen').classList.add('hidden');
+  }
+</script>
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo } = React;
+
+const STORAGE_KEY = 'yen_studio_orders_v1';
+const CLIENTS_KEY = 'yen_studio_clients_v1';
+
+const STATUS = {
+  new: { label: 'New', color: '#7C9CBF', bg: 'rgba(124,156,191,0.12)' },
+  in_progress: { label: 'In progress', color: '#C9A96E', bg: 'rgba(201,169,110,0.12)' },
+  review: { label: 'Review', color: '#B07FD4', bg: 'rgba(176,127,212,0.12)' },
+  done: { label: 'Done', color: '#7FBF8C', bg: 'rgba(127,191,140,0.12)' },
+  delivered: { label: 'Delivered', color: '#888580', bg: 'rgba(136,133,128,0.12)' },
+};
+
+const SERVICE_TYPES = ['Portrait retouching', 'Product photography', 'Fashion & beauty', 'Color grading', 'Batch processing', 'Composite & creative'];
+
+const seedOrders = () => [
+  { id: 'ORD-1001', client: 'Linh Nguyen', email: 'linh.nguyen@example.com', service: 'Portrait retouching', photos: 45, price: 225, status: 'in_progress', deadline: daysFromNow(2), created: daysAgo(3), notes: 'Wedding photos, natural skin tone, soft warm tones' },
+  { id: 'ORD-1002', client: 'Minh Tran', email: 'minh@shopvn.com', service: 'Product photography', photos: 120, price: 144, status: 'new', deadline: daysFromNow(5), created: daysAgo(1), notes: 'Skincare bottles, white background, ecommerce ready' },
+  { id: 'ORD-1003', client: 'Thanh Phuong', email: 'thanh@fashionbrand.vn', service: 'Fashion & beauty', photos: 30, price: 240, status: 'review', deadline: daysFromNow(1), created: daysAgo(6), notes: 'Summer lookbook, editorial color grade' },
+  { id: 'ORD-1004', client: 'Sarah Johnson', email: 'sarah.j@gmail.com', service: 'Product photography', photos: 18, price: 36, status: 'done', deadline: daysAgo(1), created: daysAgo(8), notes: 'Jewelry collection, jewel tones, studio white bg' },
+  { id: 'ORD-1005', client: 'David Kim', email: 'dkim@agency.co', service: 'Batch processing', photos: 200, price: 480, status: 'delivered', deadline: daysAgo(5), created: daysAgo(14), notes: 'Corporate headshots batch, consistent lighting' },
+];
+
+function daysFromNow(n) { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); }
+function fmtDate(s) { const d = new Date(s + 'T00:00:00'); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+function daysUntil(s) { const d = new Date(s + 'T00:00:00'); const now = new Date(); now.setHours(0,0,0,0); return Math.round((d - now) / 86400000); }
+export default function App() {
+  const [orders, setOrders] = useState([]);
+  const [view, setView] = useState('orders');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showNewOrder, setShowNewOrder] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try { setOrders(JSON.parse(saved)); } catch { setOrders(seedOrders()); }
+    } else {
+      setOrders(seedOrders());
+    }
+  }, []);
+
+  useEffect(() => {
+    if (orders.length) localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  }, [orders]);
+
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2200);
+  }
+
+  function updateStatus(id, status) {
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
+    showToast(`Marked as ${STATUS[status].label}`);
+  }
+
+  function addOrder(order) {
+    const newId = 'ORD-' + (1000 + orders.length + Math.floor(Math.random() * 100));
+    setOrders(prev => [{ ...order, id: newId, created: new Date().toISOString().slice(0, 10), status: 'new' }, ...prev]);
+    setShowNewOrder(false);
+    showToast('Order created');
+  }
+
+  function deleteOrder(id) {
+    setOrders(prev => prev.filter(o => o.id !== id));
+    setSelectedOrder(null);
+    showToast('Order deleted');
+  }
+
+  const filteredOrders = useMemo(() => {
+    return orders
+      .filter(o => statusFilter === 'all' || o.status === statusFilter)
+      .filter(o => {
+        if (!search.trim()) return true;
+        const q = search.toLowerCase();
+        return o.client.toLowerCase().includes(q) || o.id.toLowerCase().includes(q) || o.service.toLowerCase().includes(q);
+      })
+      .sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+  }, [orders, statusFilter, search]);
+
+  const stats = useMemo(() => {
+    const active = orders.filter(o => o.status !== 'delivered').length;
+    const dueSoon = orders.filter(o => o.status !== 'delivered' && daysUntil(o.deadline) <= 2).length;
+    const revenue = orders.filter(o => o.status === 'done' || o.status === 'delivered').reduce((s, o) => s + o.price, 0);
+    const photos = orders.reduce((s, o) => s + o.photos, 0);
+    return { active, dueSoon, revenue, photos };
+  }, [orders]);
+
+  const clients = useMemo(() => {
+    const map = {};
+    orders.forEach(o => {
+      if (!map[o.client]) map[o.client] = { name: o.client, email: o.email, orders: [], totalSpent: 0 };
+      map[o.client].orders.push(o);
+      if (o.status === 'done' || o.status === 'delivered') map[o.client].totalSpent += o.price;
+    });
+    return Object.values(map).sort((a, b) => b.orders.length - a.orders.length);
+  }, [orders]);
+
+  return (
+    <div style={S.app}>
+      <style>{globalCSS}</style>
+      <Sidebar view={view} setView={setView} />
+      <main style={S.main}>
+        <Topbar
+          view={view}
+          search={search}
+          setSearch={setSearch}
+          onNewOrder={() => setShowNewOrder(true)}
+        />
+        <div style={S.content}>
+          {view === 'orders' && (
+            <>
+              <StatsRow stats={stats} />
+              <FilterBar statusFilter={statusFilter} setStatusFilter={setStatusFilter} orders={orders} />
+              <OrdersTable orders={filteredOrders} onSelect={setSelectedOrder} onStatusChange={updateStatus} />
+            </>
+          )}
+          {view === 'clients' && <ClientsView clients={clients} />}
+        </div>
+      </main>
+
+      {selectedOrder && (
+        <OrderDrawer
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          onStatusChange={updateStatus}
+          onDelete={deleteOrder}
+        />
+      )}
+
+      {showNewOrder && (
+        <NewOrderModal onClose={() => setShowNewOrder(false)} onSave={addOrder} />
+      )}
+
+      {toast && <div style={S.toast}>{toast}</div>}
+    </div>
+  );
+}
+
+function Sidebar({ view, setView }) {
+  return (
+    <aside style={S.sidebar}>
+      <div style={S.logo}>
+        Yên<span style={{ color: 'var(--gold)' }}>.</span>Studio
+      </div>
+      <nav style={S.nav}>
+        <SidebarItem active={view === 'orders'} onClick={() => setView('orders')} label="Orders" icon={<IconOrders />} />
+        <SidebarItem active={view === 'clients'} onClick={() => setView('clients')} label="Clients" icon={<IconClients />} />
+      </nav>
+      <div style={S.sidebarFooter}>
+        <div style={S.avatarCircle}>Y</div>
+        <div>
+          <div style={{ fontSize: 13, color: 'var(--text)' }}>Yên</div>
+          <div style={{ fontSize: 11, color: 'var(--muted)' }}>Freelance editor</div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+function SidebarItem({ active, onClick, label, icon }) {
+  return (
+    <button onClick={onClick} style={{ ...S.sidebarItem, ...(active ? S.sidebarItemActive : {}) }}>
+      {icon}
+      <span>{label}</span>
+    </button>
+  );
+}
+
+function Topbar({ view, search, setSearch, onNewOrder }) {
+  return (
+    <div style={S.topbar}>
+      <div>
+        <h1 style={S.pageTitle}>{view === 'orders' ? 'Orders' : 'Clients'}</h1>
+        <p style={S.pageSub}>{view === 'orders' ? 'Track every project from request to delivery' : 'Everyone you\'ve worked with'}</p>
+      </div>
+      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        {view === 'orders' && (
+          <div style={S.searchBox}>
+            <IconSearch />
+            <input
+              placeholder="Search orders, clients..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={S.searchInput}
+            />
+          </div>
+        )}
+        {view === 'orders' && (
+          <button style={S.btnPrimary} onClick={onNewOrder}>
+            <IconPlus /> New order
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function StatsRow({ stats }) {
+  return (
+    <div style={S.statsRow}>
+      <StatCard label="Active orders" value={stats.active} />
+      <StatCard label="Due in 2 days" value={stats.dueSoon} accent={stats.dueSoon > 0} />
+      <StatCard label="Revenue (completed)" value={`$${stats.revenue}`} />
+      <StatCard label="Photos in pipeline" value={stats.photos} />
+    </div>
+  );
+}
+
+function StatCard({ label, value, accent }) {
+  return (
+    <div style={S.statCard}>
+      <div style={{ ...S.statValue, color: accent ? '#E07856' : 'var(--text)' }}>{value}</div>
+      <div style={S.statLabel}>{label}</div>
+    </div>
+  );
+}
+
+function FilterBar({ statusFilter, setStatusFilter, orders }) {
+  const counts = { all: orders.length };
+  Object.keys(STATUS).forEach(k => counts[k] = orders.filter(o => o.status === k).length);
+  return (
+    <div style={S.filterBar}>
+      <FilterPill active={statusFilter === 'all'} onClick={() => setStatusFilter('all')} label="All" count={counts.all} />
+      {Object.entries(STATUS).map(([key, s]) => (
+        <FilterPill key={key} active={statusFilter === key} onClick={() => setStatusFilter(key)} label={s.label} count={counts[key]} color={s.color} />
+      ))}
+    </div>
+  );
+}
+
+function FilterPill({ active, onClick, label, count, color }) {
+  return (
+    <button onClick={onClick} style={{ ...S.filterPill, ...(active ? S.filterPillActive : {}) }}>
+      {color && <span style={{ width: 6, height: 6, borderRadius: '50%', background: color, display: 'inline-block', marginRight: 6 }} />}
+      {label} <span style={{ opacity: 0.5, marginLeft: 4 }}>{count}</span>
+    </button>
+  );
+}
+
+function OrdersTable({ orders, onSelect, onStatusChange }) {
+  if (orders.length === 0) {
+    return (
+      <div style={S.emptyState}>
+        <div style={{ fontSize: 32, marginBottom: 12 }}>📭</div>
+        <p style={{ color: 'var(--muted)', fontSize: 14 }}>No orders match this filter.</p>
+      </div>
+    );
+  }
+  return (
+    <div style={S.tableWrap}>
+      <table style={S.table}>
+        <thead>
+          <tr>
+            <th style={S.th}>Order</th>
+            <th style={S.th}>Client</th>
+            <th style={S.th}>Service</th>
+            <th style={S.th}>Photos</th>
+            <th style={S.th}>Price</th>
+            <th style={S.th}>Deadline</th>
+            <th style={S.th}>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {orders.map(o => (
+            <OrderRow key={o.id} order={o} onSelect={onSelect} onStatusChange={onStatusChange} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function OrderRow({ order, onSelect, onStatusChange }) {
+  const du = daysUntil(order.deadline);
+  const urgent = du <= 1 && order.status !== 'delivered';
+  return (
+    <tr style={S.tr} onClick={() => onSelect(order)}>
+      <td style={S.td}><span style={S.orderId}>{order.id}</span></td>
+      <td style={S.td}>
+        <div style={{ fontSize: 13, color: 'var(--text)' }}>{order.client}</div>
+        <div style={{ fontSize: 11, color: 'var(--muted)' }}>{order.email}</div>
+      </td>
+      <td style={S.td}>{order.service}</td>
+      <td style={S.td}>{order.photos}</td>
+      <td style={S.td}>${order.price}</td>
+      <td style={S.td}>
+        <span style={{ color: urgent ? '#E07856' : 'var(--muted)' }}>
+          {fmtDate(order.deadline)} {urgent && du >= 0 ? `(${du === 0 ? 'today' : '1 day'})` : urgent ? '(overdue)' : ''}
+        </span>
+      </td>
+      <td style={S.td} onClick={e => e.stopPropagation()}>
+        <StatusDropdown status={order.status} onChange={s => onStatusChange(order.id, s)} />
+      </td>
+    </tr>
+  );
+}
+
+function StatusDropdown({ status, onChange }) {
+  const [open, setOpen] = useState(false);
+  const s = STATUS[status];
+  return (
+    <div style={{ position: 'relative' }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{ ...S.statusBadge, color: s.color, background: s.bg }}
+      >
+        {s.label} <IconChevron />
+      </button>
+      {open && (
+        <>
+          <div style={S.dropdownOverlay} onClick={() => setOpen(false)} />
+          <div style={S.dropdown}>
+            {Object.entries(STATUS).map(([key, st]) => (
+              <button
+                key={key}
+                style={{ ...S.dropdownItem, color: st.color }}
+                onClick={() => { onChange(key); setOpen(false); }}
+              >
+                {st.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function OrderDrawer({ order, onClose, onStatusChange, onDelete }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const s = STATUS[order.status];
+  const du = daysUntil(order.deadline);
+  return (
+    <>
+      <div style={S.drawerOverlay} onClick={onClose} />
+      <div style={S.drawer}>
+        <div style={S.drawerHeader}>
+          <div>
+            <div style={S.orderId}>{order.id}</div>
+            <h2 style={S.drawerTitle}>{order.client}</h2>
+          </div>
+          <button onClick={onClose} style={S.closeBtn}><IconClose /></button>
+        </div>
+
+        <div style={{ ...S.statusBadge, color: s.color, background: s.bg, display: 'inline-flex', marginBottom: 24 }}>
+          {s.label}
+        </div>
+
+        <div style={S.drawerSection}>
+          <DrawerField label="Email" value={order.email} />
+          <DrawerField label="Service" value={order.service} />
+          <DrawerField label="Photo count" value={order.photos} />
+          <DrawerField label="Price" value={`$${order.price}`} />
+          <DrawerField label="Created" value={fmtDate(order.created)} />
+          <DrawerField
+            label="Deadline"
+            value={`${fmtDate(order.deadline)} ${du >= 0 ? `(in ${du}d)` : '(overdue)'}`}
+            warn={du <= 1 && order.status !== 'delivered'}
+          />
+        </div>
+
+        {order.notes && (
+          <div style={S.drawerSection}>
+            <div style={S.fieldLabel}>Notes</div>
+            <p style={S.notesText}>{order.notes}</p>
+          </div>
+        )}
+
+        <div style={S.fieldLabel}>Update status</div>
+        <div style={S.statusGrid}>
+          {Object.entries(STATUS).map(([key, st]) => (
+            <button
+              key={key}
+              onClick={() => onStatusChange(order.id, key)}
+              style={{
+                ...S.statusGridBtn,
+                borderColor: order.status === key ? st.color : 'var(--border)',
+                color: order.status === key ? st.color : 'var(--muted)',
+              }}
+            >
+              {st.label}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ marginTop: 32, paddingTop: 20, borderTop: '1px solid var(--border)' }}>
+          {!confirmDelete ? (
+            <button style={S.deleteBtn} onClick={() => setConfirmDelete(true)}>Delete order</button>
+          ) : (
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button style={S.deleteBtnConfirm} onClick={() => onDelete(order.id)}>Confirm delete</button>
+              <button style={S.cancelBtn} onClick={() => setConfirmDelete(false)}>Cancel</button>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function DrawerField({ label, value, warn }) {
+  return (
+    <div style={S.drawerField}>
+      <span style={S.fieldLabel}>{label}</span>
+      <span style={{ fontSize: 13, color: warn ? '#E07856' : 'var(--text)' }}>{value}</span>
+    </div>
+  );
+}
+
+function NewOrderModal({ onClose, onSave }) {
+  const [form, setForm] = useState({
+    client: '', email: '', service: SERVICE_TYPES[0], photos: '', price: '', deadline: daysFromNow(3), notes: ''
+  });
+
+  function set(field, value) { setForm(prev => ({ ...prev, [field]: value })); }
+
+  function submit() {
+    if (!form.client.trim() || !form.email.trim()) return;
+    onSave({ ...form, photos: Number(form.photos) || 0, price: Number(form.price) || 0 });
+  }
+
+  return (
+    <>
+      <div style={S.drawerOverlay} onClick={onClose} />
+      <div style={S.modal}>
+        <div style={S.drawerHeader}>
+          <h2 style={S.drawerTitle}>New order</h2>
+          <button onClick={onClose} style={S.closeBtn}><IconClose /></button>
+        </div>
+
+        <FormRow>
+          <FormField label="Client name" value={form.client} onChange={v => set('client', v)} placeholder="Jane Doe" />
+          <FormField label="Email" value={form.email} onChange={v => set('email', v)} placeholder="jane@example.com" />
+        </FormRow>
+
+        <FormField label="Service type" full>
+          <select style={S.input} value={form.service} onChange={e => set('service', e.target.value)}>
+            {SERVICE_TYPES.map(s => <option key={s}>{s}</option>)}
+          </select>
+        </FormField>
+
+        <FormRow>
+          <FormField label="Number of photos" value={form.photos} onChange={v => set('photos', v)} placeholder="20" type="number" />
+          <FormField label="Price (USD)" value={form.price} onChange={v => set('price', v)} placeholder="100" type="number" />
+        </FormRow>
+
+        <FormField label="Deadline" value={form.deadline} onChange={v => set('deadline', v)} type="date" />
+
+        <FormField label="Notes" full>
+          <textarea
+            style={{ ...S.input, minHeight: 80, resize: 'vertical' }}
+            value={form.notes}
+            onChange={e => set('notes', e.target.value)}
+            placeholder="Style preferences, reference links, special instructions..."
+          />
+        </FormField>
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
+          <button style={S.btnPrimary} onClick={submit}>Create order</button>
+          <button style={S.cancelBtn} onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function FormRow({ children }) {
+  return <div style={{ display: 'flex', gap: 12 }}>{children}</div>;
+}
+
+function FormField({ label, value, onChange, placeholder, type = 'text', full, children }) {
+  return (
+    <div style={{ flex: full ? '1 1 100%' : 1, marginBottom: 16 }}>
+      <label style={S.fieldLabel}>{label}</label>
+      {children || (
+        <input
+          type={type}
+          style={S.input}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder={placeholder}
+        />
+      )}
+    </div>
+  );
+}
+
+function ClientsView({ clients }) {
+  if (clients.length === 0) {
+    return <div style={S.emptyState}><p style={{ color: 'var(--muted)' }}>No clients yet.</p></div>;
+  }
+  return (
+    <div style={S.clientsGrid}>
+      {clients.map(c => (
+        <div key={c.name} style={S.clientCard}>
+          <div style={S.clientAvatar}>{c.name.split(' ').map(n => n[0]).join('').slice(0, 2)}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, color: 'var(--text)' }}>{c.name}</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 8 }}>{c.email}</div>
+            <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--muted)' }}>
+              <span>{c.orders.length} order{c.orders.length > 1 ? 's' : ''}</span>
+              <span>${c.totalSpent} total</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// --- Icons ---
+function IconOrders() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>; }
+function IconClients() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>; }
+function IconSearch() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>; }
+function IconPlus() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M12 5v14M5 12h14"/></svg>; }
+function IconChevron() { return <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginLeft: 4 }}><path d="M6 9l6 6 6-6"/></svg>; }
+function IconClose() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>; }
+
+const globalCSS = `
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  :root {
+    --bg: #0D0D0D;
+    --bg2: #161616;
+    --bg3: #1E1E1E;
+    --gold: #C9A96E;
+    --gold2: #E8C98A;
+    --text: #F0EDE8;
+    --muted: #888580;
+    --border: #2A2A2A;
+  }
+  input::placeholder, textarea::placeholder { color: #5A5650; }
+  input, textarea, select { font-family: inherit; }
+  table { border-collapse: collapse; width: 100%; }
+  @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+`;
+
+const S = {
+  app: { display: 'flex', minHeight: '100vh', background: 'var(--bg)', fontFamily: "'Inter', -apple-system, sans-serif", color: 'var(--text)' },
+  sidebar: { width: 220, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', padding: '28px 20px', flexShrink: 0 },
+  logo: { fontFamily: "'Playfair Display', serif", fontSize: 20, marginBottom: 36, letterSpacing: '0.02em' },
+  nav: { display: 'flex', flexDirection: 'column', gap: 4, flex: 1 },
+  sidebarItem: { display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 8, background: 'none', border: 'none', color: 'var(--muted)', fontSize: 13, cursor: 'pointer', textAlign: 'left', transition: 'all .15s' },
+  sidebarItemActive: { background: 'var(--bg2)', color: 'var(--text)' },
+  sidebarFooter: { display: 'flex', alignItems: 'center', gap: 10, paddingTop: 16, borderTop: '1px solid var(--border)' },
+  avatarCircle: { width: 32, height: 32, borderRadius: '50%', background: 'var(--bg3)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: 'var(--gold)', fontFamily: "'Playfair Display', serif" },
+  main: { flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 },
+  topbar: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '28px 36px', borderBottom: '1px solid var(--border)', flexWrap: 'wrap', gap: 16 },
+  pageTitle: { fontFamily: "'Playfair Display', serif", fontSize: 26, margin: 0, marginBottom: 4 },
+  pageSub: { fontSize: 13, color: 'var(--muted)', margin: 0 },
+  searchBox: { display: 'flex', alignItems: 'center', gap: 8, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 12px', color: 'var(--muted)' },
+  searchInput: { background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontSize: 13, width: 200 },
+  btnPrimary: { display: 'flex', alignItems: 'center', gap: 6, background: 'var(--gold)', color: '#0D0D0D', border: 'none', borderRadius: 8, padding: '10px 18px', fontSize: 13, fontWeight: 500, cursor: 'pointer' },
+  content: { padding: '28px 36px', flex: 1, overflowY: 'auto' },
+  statsRow: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 },
+  statCard: { background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px' },
+  statValue: { fontFamily: "'Playfair Display', serif", fontSize: 28, marginBottom: 4 },
+  statLabel: { fontSize: 12, color: 'var(--muted)' },
+  filterBar: { display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' },
+  filterPill: { display: 'flex', alignItems: 'center', padding: '7px 14px', borderRadius: 100, border: '1px solid var(--border)', background: 'none', color: 'var(--muted)', fontSize: 12.5, cursor: 'pointer' },
+  filterPillActive: { borderColor: 'var(--gold)', color: 'var(--gold)' },
+  tableWrap: { border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' },
+  table: { fontSize: 13 },
+  th: { textAlign: 'left', padding: '12px 16px', fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)', background: 'var(--bg2)', borderBottom: '1px solid var(--border)', fontWeight: 400 },
+  tr: { cursor: 'pointer', transition: 'background .12s' },
+  td: { padding: '14px 16px', borderBottom: '1px solid var(--border)', color: 'var(--text)' },
+  orderId: { fontFamily: 'monospace', fontSize: 12, color: 'var(--muted)' },
+  statusBadge: { display: 'inline-flex', alignItems: 'center', padding: '5px 10px', borderRadius: 100, fontSize: 12, border: 'none', cursor: 'pointer' },
+  dropdownOverlay: { position: 'fixed', inset: 0, zIndex: 10 },
+  dropdown: { position: 'absolute', top: '110%', left: 0, background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 8, padding: 4, zIndex: 11, minWidth: 130, boxShadow: '0 8px 24px rgba(0,0,0,.4)' },
+  dropdownItem: { display: 'block', width: '100%', textAlign: 'left', padding: '8px 10px', background: 'none', border: 'none', fontSize: 12.5, cursor: 'pointer', borderRadius: 6 },
+  emptyState: { textAlign: 'center', padding: '80px 0' },
+  drawerOverlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 20, animation: 'fadeIn .2s' },
+  drawer: { position: 'fixed', top: 0, right: 0, bottom: 0, width: 420, background: 'var(--bg)', borderLeft: '1px solid var(--border)', padding: 28, zIndex: 21, overflowY: 'auto', animation: 'slideIn .25s ease' },
+  modal: { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 480, maxHeight: '85vh', overflowY: 'auto', background: 'var(--bg)', border: '1px solid var(--border)', borderRadius: 16, padding: 28, zIndex: 21 },
+  drawerHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
+  drawerTitle: { fontFamily: "'Playfair Display', serif", fontSize: 22, margin: '4px 0 0' },
+  closeBtn: { background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8, width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', cursor: 'pointer' },
+  drawerSection: { borderTop: '1px solid var(--border)', paddingTop: 16, marginBottom: 16 },
+  drawerField: { display: 'flex', justifyContent: 'space-between', padding: '7px 0' },
+  fieldLabel: { fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--muted)', display: 'block', marginBottom: 6 },
+  notesText: { fontSize: 13, color: 'var(--text)', lineHeight: 1.6, margin: 0 },
+  statusGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 },
+  statusGridBtn: { padding: '9px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'none', fontSize: 12.5, cursor: 'pointer' },
+  deleteBtn: { background: 'none', border: '1px solid var(--border)', color: '#E07856', borderRadius: 8, padding: '9px 16px', fontSize: 13, cursor: 'pointer' },
+  deleteBtnConfirm: { background: '#E07856', border: 'none', color: '#0D0D0D', borderRadius: 8, padding: '9px 16px', fontSize: 13, cursor: 'pointer' },
+  cancelBtn: { background: 'none', border: '1px solid var(--border)', color: 'var(--muted)', borderRadius: 8, padding: '9px 16px', fontSize: 13, cursor: 'pointer' },
+  input: { width: '100%', background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 12px', color: 'var(--text)', fontSize: 13, outline: 'none' },
+  clientsGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14 },
+  clientCard: { display: 'flex', gap: 14, background: 'var(--bg2)', border: '1px solid var(--border)', borderRadius: 12, padding: 18, alignItems: 'flex-start' },
+  clientAvatar: { width: 40, height: 40, borderRadius: '50%', background: 'var(--bg3)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: 'var(--gold)', flexShrink: 0, fontFamily: "'Playfair Display', serif" },
+  toast: { position: 'fixed', bottom: 28, left: '50%', transform: 'translateX(-50%)', background: 'var(--bg3)', border: '1px solid var(--border)', color: 'var(--text)', padding: '10px 20px', borderRadius: 100, fontSize: 13, zIndex: 30, animation: 'toastIn .25s ease' },
+};
+
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
