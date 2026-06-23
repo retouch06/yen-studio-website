@@ -122,7 +122,7 @@ function daysFromNow(n) { const d = new Date(); d.setDate(d.getDate() + n); retu
 function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); }
 function fmtDate(s) { const d = new Date(s + 'T00:00:00'); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
 function daysUntil(s) { const d = new Date(s + 'T00:00:00'); const now = new Date(); now.setHours(0,0,0,0); return Math.round((d - now) / 86400000); }
-export default function App() {
+function App() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState('orders');
