@@ -126,7 +126,7 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .modal-ba{position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;cursor:default;user-select:none;border-radius:8px;background:#111}
 .modal-ba>#modalBefore{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
 .modal-ba-after{position:absolute;top:0;left:0;bottom:0;overflow:hidden;width:50%}
-.modal-ba-after>#modalAfterImg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;min-width:100%}
+.modal-ba-after>#modalAfterImg{position:absolute;top:0;left:0;height:100%;object-fit:cover}
 .modal-ba-line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#C9A96E;transform:translateX(-50%);pointer-events:none}
 .modal-ba-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;background:#C9A96E;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 2px 12px rgba(0,0,0,.5)}
 .modal-ba-handle svg{width:18px;height:18px;fill:#0D0D0D}
@@ -797,12 +797,14 @@ function closeModalDirect() {
 }
 function setModalPct(pct) {
   pct = Math.max(5, Math.min(95, pct));
+  const ba = document.getElementById('modalBA');
   const afterEl = document.getElementById('modalAfter');
   const afterImg = document.getElementById('modalAfterImg');
-  if (afterEl) {
+  if (afterEl && ba) {
+    const fullW = ba.getBoundingClientRect().width;
     afterEl.style.width = pct + '%';
-    // Keep after image always full width of container so object-fit:cover works
-    if (afterImg) afterImg.style.width = (100 / pct * 100) + '%';
+    // After image must always be the full container width so object-fit:cover works correctly
+    if (afterImg && fullW) afterImg.style.width = fullW + 'px';
   }
   const line = document.getElementById('modalLine');
   const handle = document.getElementById('modalHandle');
