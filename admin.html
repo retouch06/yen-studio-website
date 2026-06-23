@@ -8,6 +8,7 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>body{margin:0;background:#0D0D0D}
 #lockScreen{position:fixed;inset:0;background:#0D0D0D;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'Inter',sans-serif}
 #lockScreen.hidden{display:none}
@@ -57,8 +58,9 @@
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo } = React;
 
-const STORAGE_KEY = 'yen_studio_orders_v1';
-const CLIENTS_KEY = 'yen_studio_clients_v1';
+const SUPABASE_URL = "https://lrkmmjcqsfyqiijwuwgb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STATUS = {
   new: { label: 'New', color: '#7C9CBF', bg: 'rgba(124,156,191,0.12)' },
@@ -84,6 +86,7 @@ function fmtDate(s) { const d = new Date(s + 'T00:00:00'); return d.toLocaleDate
 function daysUntil(s) { const d = new Date(s + 'T00:00:00'); const now = new Date(); now.setHours(0,0,0,0); return Math.round((d - now) / 86400000); }
 export default function App() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [view, setView] = useState('orders');
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
@@ -91,37 +94,50 @@ export default function App() {
   const [showNewOrder, setShowNewOrder] = useState(false);
   const [toast, setToast] = useState(null);
 
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try { setOrders(JSON.parse(saved)); } catch { setOrders(seedOrders()); }
+  async function loadOrders() {
+    setLoading(true);
+    const { data, error } = await supabase.from('orders').select('*').order('inserted_at', { ascending: false });
+    if (error) {
+      showToast('Failed to load orders');
+      console.error(error);
+    } else if (data.length === 0) {
+      // First run: seed with sample data so the dashboard isn't empty
+      const seeds = seedOrders();
+      await supabase.from('orders').insert(seeds);
+      setOrders(seeds);
     } else {
-      setOrders(seedOrders());
+      setOrders(data);
     }
-  }, []);
+    setLoading(false);
+  }
 
-  useEffect(() => {
-    if (orders.length) localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-  }, [orders]);
+  useEffect(() => { loadOrders(); }, []);
 
   function showToast(msg) {
     setToast(msg);
     setTimeout(() => setToast(null), 2200);
   }
 
-  function updateStatus(id, status) {
+  async function updateStatus(id, status) {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    showToast(`Marked as ${STATUS[status].label}`);
+    const { error } = await supabase.from('orders').update({ status }).eq('id', id);
+    if (error) { showToast('Failed to update'); console.error(error); }
+    else showToast(`Marked as ${STATUS[status].label}`);
   }
 
-  function addOrder(order) {
-    const newId = 'ORD-' + (1000 + orders.length + Math.floor(Math.random() * 100));
-    setOrders(prev => [{ ...order, id: newId, created: new Date().toISOString().slice(0, 10), status: 'new' }, ...prev]);
+  async function addOrder(order) {
+    const newId = 'ORD-' + (1000 + orders.length + Math.floor(Math.random() * 900));
+    const newOrder = { ...order, id: newId, created: new Date().toISOString().slice(0, 10), status: 'new' };
+    const { error } = await supabase.from('orders').insert([newOrder]);
+    if (error) { showToast('Failed to create order'); console.error(error); return; }
+    setOrders(prev => [newOrder, ...prev]);
     setShowNewOrder(false);
     showToast('Order created');
   }
 
-  function deleteOrder(id) {
+  async function deleteOrder(id) {
+    const { error } = await supabase.from('orders').delete().eq('id', id);
+    if (error) { showToast('Failed to delete'); console.error(error); return; }
     setOrders(prev => prev.filter(o => o.id !== id));
     setSelectedOrder(null);
     showToast('Order deleted');
@@ -168,14 +184,17 @@ export default function App() {
           onNewOrder={() => setShowNewOrder(true)}
         />
         <div style={S.content}>
-          {view === 'orders' && (
+          {loading ? (
+            <div style={S.emptyState}><p style={{ color: 'var(--muted)' }}>Loading orders...</p></div>
+          ) : view === 'orders' ? (
             <>
               <StatsRow stats={stats} />
               <FilterBar statusFilter={statusFilter} setStatusFilter={setStatusFilter} orders={orders} />
               <OrdersTable orders={filteredOrders} onSelect={setSelectedOrder} onStatusChange={updateStatus} />
             </>
+          ) : (
+            <ClientsView clients={clients} />
           )}
-          {view === 'clients' && <ClientsView clients={clients} />}
         </div>
       </main>
 
