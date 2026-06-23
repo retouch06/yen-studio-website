@@ -8,15 +8,6 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script>
-  import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm').then(({ createClient }) => {
-    window.supabaseClient = createClient(
-      "https://lrkmmjcqsfyqiijwuwgb.supabase.co",
-      "sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg"
-    );
-    window.dispatchEvent(new Event('supabase-ready'));
-  });
-</script>
 <style>body{margin:0;background:#0D0D0D}
 #lockScreen{position:fixed;inset:0;background:#0D0D0D;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'Inter',sans-serif}
 #lockScreen.hidden{display:none}
@@ -69,6 +60,46 @@ const { useState, useEffect, useMemo } = React;
 const SUPABASE_URL = "https://lrkmmjcqsfyqiijwuwgb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg";
 
+// Minimal REST client for Supabase's PostgREST API — no SDK needed, avoids all bundler/module conflicts.
+const db = {
+  headers: {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json',
+  },
+  async select(table, query = '') {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?select=*${query}`, { headers: this.headers });
+    if (!res.ok) return { data: null, error: await res.text() };
+    return { data: await res.json(), error: null };
+  },
+  async insert(table, rows) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: { ...this.headers, Prefer: 'return=representation' },
+      body: JSON.stringify(rows),
+    });
+    if (!res.ok) return { data: null, error: await res.text() };
+    return { data: await res.json(), error: null };
+  },
+  async update(table, id, patch) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...this.headers, Prefer: 'return=representation' },
+      body: JSON.stringify(patch),
+    });
+    if (!res.ok) return { data: null, error: await res.text() };
+    return { data: await res.json(), error: null };
+  },
+  async remove(table, id) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: this.headers,
+    });
+    if (!res.ok) return { error: await res.text() };
+    return { error: null };
+  },
+};
+
 const STATUS = {
   new: { label: 'New', color: '#7C9CBF', bg: 'rgba(124,156,191,0.12)' },
   in_progress: { label: 'In progress', color: '#C9A96E', bg: 'rgba(201,169,110,0.12)' },
@@ -103,15 +134,14 @@ export default function App() {
 
   async function loadOrders() {
     setLoading(true);
-    const supabase = window.supabaseClient;
-    const { data, error } = await supabase.from('orders').select('*').order('inserted_at', { ascending: false });
+    const { data, error } = await db.select('orders', '&order=inserted_at.desc');
     if (error) {
       showToast('Failed to load orders');
       console.error(error);
     } else if (data.length === 0) {
       // First run: seed with sample data so the dashboard isn't empty
       const seeds = seedOrders();
-      await supabase.from('orders').insert(seeds);
+      await db.insert('orders', seeds);
       setOrders(seeds);
     } else {
       setOrders(data);
@@ -119,13 +149,7 @@ export default function App() {
     setLoading(false);
   }
 
-  useEffect(() => {
-    if (window.supabaseClient) {
-      loadOrders();
-    } else {
-      window.addEventListener('supabase-ready', loadOrders, { once: true });
-    }
-  }, []);
+  useEffect(() => { loadOrders(); }, []);
 
   function showToast(msg) {
     setToast(msg);
@@ -134,7 +158,7 @@ export default function App() {
 
   async function updateStatus(id, status) {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    const { error } = await window.supabaseClient.from('orders').update({ status }).eq('id', id);
+    const { error } = await db.update('orders', id, { status });
     if (error) { showToast('Failed to update'); console.error(error); }
     else showToast(`Marked as ${STATUS[status].label}`);
   }
@@ -142,7 +166,7 @@ export default function App() {
   async function addOrder(order) {
     const newId = 'ORD-' + (1000 + orders.length + Math.floor(Math.random() * 900));
     const newOrder = { ...order, id: newId, created: new Date().toISOString().slice(0, 10), status: 'new' };
-    const { error } = await window.supabaseClient.from('orders').insert([newOrder]);
+    const { error } = await db.insert('orders', [newOrder]);
     if (error) { showToast('Failed to create order'); console.error(error); return; }
     setOrders(prev => [newOrder, ...prev]);
     setShowNewOrder(false);
@@ -150,7 +174,7 @@ export default function App() {
   }
 
   async function deleteOrder(id) {
-    const { error } = await window.supabaseClient.from('orders').delete().eq('id', id);
+    const { error } = await db.remove('orders', id);
     if (error) { showToast('Failed to delete'); console.error(error); return; }
     setOrders(prev => prev.filter(o => o.id !== id));
     setSelectedOrder(null);
