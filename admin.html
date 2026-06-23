@@ -161,16 +161,6 @@ function daysUntil(d) {
   return Math.ceil((new Date(d) - new Date()) / 86400000);
 }
 
-function useIsMobile(){
-  const [mobile, setMobile] = React.useState(window.innerWidth < 768);
-  React.useEffect(()=>{
-    const fn = ()=>setMobile(window.innerWidth < 768);
-    window.addEventListener('resize', fn);
-    return ()=>window.removeEventListener('resize', fn);
-  },[]);
-  return mobile;
-}
-
 function App() {
   const [auth, setAuth] = React.useState(() => sessionStorage.getItem('ptAuth') === '1');
   const [pw, setPw] = React.useState('');
@@ -319,16 +309,15 @@ function App() {
     </div>
   );
 
-  const isMobile = useIsMobile();
   return (
-    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: isMobile ? 'auto' : '100vh', minHeight: '100vh', width: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', height: '100vh', minHeight: '100vh', width: '100%' }}>
       {/* Sidebar */}
-      <div style={{ width: isMobile ? '100%' : 200, background: '#0a0a0a', borderRight: isMobile ? 'none' : '1px solid #1a1a1a', borderBottom: isMobile ? '1px solid #1a1a1a' : 'none', display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: isMobile ? 'center' : 'stretch', flexShrink: 0, flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
-        <div style={{ padding: isMobile ? '12px 16px' : '24px 20px 20px', borderBottom: isMobile ? 'none' : '1px solid #1a1a1a', borderRight: isMobile ? '1px solid #1a1a1a' : 'none' }}>
+      <div style={{ width: 200, background: '#0a0a0a', borderRight: '1px solid #1a1a1a', borderBottom: 'none', display: 'flex', flexDirection: 'column', alignItems: 'stretch', flexShrink: 0, flexWrap: 'nowrap' }}>
+        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid #1a1a1a', borderRight: 'none' }}>
           <div style={{ fontFamily: 'Playfair Display', fontSize: 18, color: '#F0EDE8', letterSpacing: '0.05em' }}>Prime Touch</div>
           <div style={{ fontSize: 10, color: '#333', marginTop: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Admin</div>
         </div>
-        <nav style={{ padding: isMobile ? '8px' : '12px 10px', flex: 1, display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: isMobile ? 4 : 0, overflowX: isMobile ? 'auto' : 'visible' }}>
+        <nav style={{ padding: '12px 10px', flex: 1, display: 'flex', flexDirection: 'column', gap: 0, overflowX: 'visible' }}>
           {[['orders','Orders',stats.active],['clients','Clients',null],['deliveries','Deliveries',null]].map(([id,label,badge]) => (
             <button key={id} onClick={() => { setTab(id); setSelected(null); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '9px 10px', background: tab === id ? '#161616' : 'none', border: 'none', color: tab === id ? '#F0EDE8' : '#555', fontSize: 13, textAlign: 'left', marginBottom: 2, letterSpacing: '0.02em', transition: 'color 0.15s' }}>
               {label}
@@ -336,9 +325,9 @@ function App() {
             </button>
           ))}
         </nav>
-        {!isMobile && <div style={{ padding: '16px 20px', borderTop: '1px solid #1a1a1a' }}>
+        <div style={{ padding: '16px 20px', borderTop: '1px solid #1a1a1a' }}>
           <button onClick={() => { sessionStorage.removeItem('ptAuth'); setAuth(false); }} style={{ background: 'none', border: 'none', color: '#333', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Sign out</button>
-        </div>}
+        </div>
       </div>
 
       {/* Main */}
@@ -364,7 +353,7 @@ function App() {
 
         {/* Stats bar (orders tab only) */}
         {tab === 'orders' && (
-          <div style={{ display: 'flex', flexWrap: isMobile ? 'wrap' : 'nowrap', gap: 1, padding: '0', flexShrink: 0, borderBottom: '1px solid #1a1a1a' }}>
+          <div style={{ display: 'flex', flexWrap: 'nowrap', gap: 1, padding: '0', flexShrink: 0, borderBottom: '1px solid #1a1a1a' }}>
             {[
               ['Active orders', stats.active, '#C9A96E'],
               ['Due ≤2 days', stats.urgent, stats.urgent > 0 ? '#E07070' : '#555'],
@@ -523,7 +512,6 @@ function App() {
 }
 
 function OrderPanel({ order, deliveries, onUpdate, onDelete, onClose, onCreateDelivery, onUploadFiles, onRemoveFile, onCopyLink, copiedLink, uploadProgress, clientPortalUrl }) {
-  const isM = useIsMobile();
   const [editing, setEditing] = React.useState(false);
   const [form, setForm] = React.useState({ ...order });
   const [creatingDelivery, setCreatingDelivery] = React.useState(false);
