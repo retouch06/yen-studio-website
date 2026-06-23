@@ -123,10 +123,10 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .modal-close:hover{border-color:#C9A96E;color:#C9A96E}
 .modal-title{position:absolute;bottom:-40px;left:0;font-size:12px;color:#888;letter-spacing:.1em;text-transform:uppercase}
 /* Modal BA slider */
-.modal-ba{position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;cursor:ew-resize;user-select:none;border-radius:8px;background:#111}
+.modal-ba{position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;cursor:default;user-select:none;border-radius:8px;background:#111}
 .modal-ba>#modalBefore{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover}
 .modal-ba-after{position:absolute;top:0;left:0;bottom:0;overflow:hidden;width:50%}
-.modal-ba-after>#modalAfterImg{position:absolute;top:0;left:0;height:100%;object-fit:cover}
+.modal-ba-after>#modalAfterImg{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;min-width:100%}
 .modal-ba-line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#C9A96E;transform:translateX(-50%);pointer-events:none}
 .modal-ba-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;background:#C9A96E;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 2px 12px rgba(0,0,0,.5)}
 .modal-ba-handle svg{width:18px;height:18px;fill:#0D0D0D}
@@ -764,6 +764,7 @@ async function handleSubmit(){
 
 // Portfolio modal BA slider
 let modalDragging = false;
+let modalAutoTimer = null;
 function openModal(el) {
   const before = el.dataset.before;
   const after = el.dataset.after;
@@ -774,34 +775,39 @@ function openModal(el) {
   const modal = document.getElementById('baModal');
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
-  function initSlider() {
-    const ba = document.getElementById('modalBA');
-    const w = ba.getBoundingClientRect().width;
-    if (!w) { setTimeout(initSlider, 50); return; }
-    const afterImg = document.getElementById('modalAfterImg');
-    afterImg.style.width = w + 'px';
-    afterImg.style.maxWidth = 'none';
-    setModalPct(50);
-  }
-  setTimeout(initSlider, 80);
+  // Start auto-slide after images load
+  clearInterval(modalAutoTimer);
+  let pct = 50, dir = 1;
+  setModalPct(pct);
+  modalAutoTimer = setInterval(() => {
+    pct += dir * 0.4;
+    if (pct >= 95) dir = -1;
+    else if (pct <= 5) dir = 1;
+    setModalPct(pct);
+  }, 20);
 }
 function closeModal(e) {
   if (e.target === document.getElementById('baModal')) closeModalDirect();
 }
 function closeModalDirect() {
+  clearInterval(modalAutoTimer);
+  modalAutoTimer = null;
   document.getElementById('baModal').classList.remove('open');
   document.body.style.overflow = '';
 }
 function setModalPct(pct) {
   pct = Math.max(5, Math.min(95, pct));
-  const ba = document.getElementById('modalBA');
-  const w = ba ? ba.getBoundingClientRect().width : 800;
   const afterEl = document.getElementById('modalAfter');
   const afterImg = document.getElementById('modalAfterImg');
-  afterEl.style.width = pct + '%';
-  if (afterImg && w) { afterImg.style.width = w + 'px'; afterImg.style.maxWidth = 'none'; }
-  document.getElementById('modalLine').style.left = pct + '%';
-  document.getElementById('modalHandle').style.left = pct + '%';
+  if (afterEl) {
+    afterEl.style.width = pct + '%';
+    // Keep after image always full width of container so object-fit:cover works
+    if (afterImg) afterImg.style.width = (100 / pct * 100) + '%';
+  }
+  const line = document.getElementById('modalLine');
+  const handle = document.getElementById('modalHandle');
+  if (line) line.style.left = pct + '%';
+  if (handle) handle.style.left = pct + '%';
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
 
@@ -813,14 +819,6 @@ if (mBA) {
   window.addEventListener('touchmove', e => { if (!modalDragging) return; const r = mBA.getBoundingClientRect(); setModalPct(((e.touches[0].clientX - r.left) / r.width) * 100); }, {passive:true});
   window.addEventListener('mouseup', () => modalDragging = false);
   window.addEventListener('touchend', () => modalDragging = false);
-  window.addEventListener('resize', () => {
-    if (document.getElementById('baModal').classList.contains('open')) {
-      const ba = document.getElementById('modalBA');
-      const w = ba.getBoundingClientRect().width;
-      const afterImg = document.getElementById('modalAfterImg');
-      if (afterImg && w) { afterImg.style.width = w + 'px'; }
-    }
-  });
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
