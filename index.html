@@ -634,7 +634,7 @@ async function handleSubmit(){
     const d2=await r2.json();
     console.log('Order:',r2.status,d2);
     if(!r2.ok){throw new Error('Order failed: '+JSON.stringify(d2));}
-    btn.textContent='Sent! I'll be in touch soon ✓';
+    btn.textContent="Sent! I'll be in touch soon ✓";
     btn.style.background='#2a5a2a';
     ['f-name','f-phone','f-email','f-photos','f-message'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('f-service').selectedIndex=0;
