@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0D0D0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Prime Touch">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <title>Prime Touch</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -199,6 +205,74 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 /* REVEAL ANIMATION */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
 .reveal.visible{opacity:1;transform:none}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+@media(max-width:480px){
+  /* Hero */
+  .hero{padding:80px 20px 48px}
+  .hero-eyebrow{font-size:10px;letter-spacing:.15em;margin-bottom:16px}
+  .hero-actions{flex-direction:column;align-items:center;gap:12px}
+  .hero-actions a{width:100%;max-width:280px;text-align:center}
+
+  /* Stats */
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat{padding:28px 16px}
+  .stat-num{font-size:32px}
+
+  /* Services */
+  .services-grid{grid-template-columns:1fr}
+  .service-card{padding:28px 24px}
+
+  /* Portfolio */
+  .portfolio-item:nth-child(1){grid-row:span 1;aspect-ratio:4/5}
+
+  /* Process */
+  .process-step{display:flex;gap:16px;align-items:flex-start}
+  .step-num{flex-shrink:0;margin-bottom:0}
+
+  /* Pricing */
+  .pricing-grid{grid-template-columns:1fr}
+  .pricing-card{padding:28px 24px}
+  .pricing-price{font-size:40px}
+
+  /* Testimonials */
+  .testimonials-grid{grid-template-columns:1fr}
+  .testimonial{padding:24px}
+
+  /* Contact */
+  .contact-layout{grid-template-columns:1fr;gap:36px}
+  .form-row{grid-template-columns:1fr}
+
+  /* Nav */
+  nav{padding:14px 20px}
+  .logo{font-size:18px}
+
+  /* Footer */
+  footer{flex-direction:column;text-align:center;padding:28px 20px;gap:12px}
+  .footer-links{flex-wrap:wrap;justify-content:center;gap:16px}
+
+  /* Before/after */
+  .slider-section{padding:0 16px 60px}
+  .ba-container{border-radius:8px}
+
+  /* Section padding */
+  .section{padding:56px 20px}
+  .portfolio-section{padding:56px 20px}
+  .process-section{padding:56px 20px}
+  .pricing-section{padding:56px 20px}
+  .testimonials{padding:56px 20px}
+  .contact-section{padding:56px 20px}
+  .section-title{margin-bottom:32px}
+
+  /* Mobile menu */
+  .mobile-menu a{font-size:24px}
+  .mobile-menu .portal-mobile{font-size:14px!important;padding:8px 22px}
+}
+
+@media(max-width:360px){
+  .hero-title{font-size:38px}
+  .stat-num{font-size:28px}
+}
 </style>
 </head>
 <body>
@@ -662,6 +736,13 @@ document.addEventListener("DOMContentLoaded",()=>{
     },20);
   });
 });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js').then(r=>console.log('SW registered')).catch(e=>console.log('SW error',e));
+  });
+}
 </script>
 </body>
 </html>

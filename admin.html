@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0D0D0D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Prime Touch">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <title>Prime Touch — Admin</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -17,6 +23,82 @@ input:focus, textarea:focus, select:focus { border-color: #C9A96E; }
 input::placeholder, textarea::placeholder { color: #444; }
 select option { background: #1a1a1a; }
 button { cursor: pointer; font-family: 'Inter', sans-serif; }
+
+/* ===== MOBILE ===== */
+@media(max-width:768px){
+  body{overflow:auto!important}
+
+  /* Stack sidebar on top */
+  div[style*="display: flex; height: 100vh"]{
+    flex-direction:column!important;
+    height:auto!important;
+    min-height:100vh
+  }
+
+  /* Sidebar becomes top bar */
+  div[style*="width: 200px"]{
+    width:100%!important;
+    flex-direction:row!important;
+    align-items:center;
+    padding:12px 16px!important;
+    border-right:none!important;
+    border-bottom:1px solid #1a1a1a!important;
+    flex-shrink:0
+  }
+  div[style*="width: 200px"] nav{
+    display:flex!important;
+    flex-direction:row!important;
+    padding:0!important;
+    gap:4px;
+    flex:1;
+    overflow-x:auto
+  }
+  div[style*="width: 200px"] nav button{
+    white-space:nowrap;
+    padding:6px 12px!important;
+    font-size:12px!important
+  }
+  div[style*="width: 200px"] div[style*="padding: '24px 20px"]{display:none}
+
+  /* Main content full width */
+  div[style*="flex: 1; display: flex; flex-direction: column"]{
+    min-width:0
+  }
+
+  /* Stats bar wrap */
+  div[style*="display: flex; gap: 1px"]{
+    flex-wrap:wrap!important
+  }
+  div[style*="display: flex; gap: 1px"] > div{
+    flex:1 1 45%!important;
+    min-width:0
+  }
+
+  /* Table scroll */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* Order detail panel — full width overlay on mobile */
+  div[style*="width: 340px"]{
+    position:fixed!important;
+    inset:0!important;
+    width:100%!important;
+    z-index:50;
+    overflow-y:auto
+  }
+
+  /* Header padding */
+  div[style*="padding: '20px 28px'"]{padding:14px 16px!important}
+}
+
+@media(max-width:480px){
+  /* New order modal full screen */
+  div[style*="width: 460px"]{
+    width:100%!important;
+    max-height:100vh!important;
+    border-radius:0!important;
+    margin:0!important
+  }
+}
 </style>
 </head>
 <body>
@@ -77,6 +159,16 @@ function genToken() { return Math.random().toString(36).slice(2) + Math.random()
 function daysUntil(d) {
   if (!d) return null;
   return Math.ceil((new Date(d) - new Date()) / 86400000);
+}
+
+function useIsMobile(){
+  const [mobile, setMobile] = React.useState(window.innerWidth < 768);
+  React.useEffect(()=>{
+    const fn = ()=>setMobile(window.innerWidth < 768);
+    window.addEventListener('resize', fn);
+    return ()=>window.removeEventListener('resize', fn);
+  },[]);
+  return mobile;
 }
 
 function App() {
@@ -228,14 +320,16 @@ function App() {
   );
 
   return (
-    <div style={{ display: 'flex', height: '100vh', width: '100%' }}>
+    const isMobile = useIsMobile();
+    return (
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', height: isMobile ? 'auto' : '100vh', minHeight: '100vh', width: '100%' }}>
       {/* Sidebar */}
-      <div style={{ width: 200, background: '#0a0a0a', borderRight: '1px solid #1a1a1a', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
-        <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid #1a1a1a' }}>
+      <div style={{ width: isMobile ? '100%' : 200, background: '#0a0a0a', borderRight: isMobile ? 'none' : '1px solid #1a1a1a', borderBottom: isMobile ? '1px solid #1a1a1a' : 'none', display: 'flex', flexDirection: isMobile ? 'row' : 'column', alignItems: isMobile ? 'center' : 'stretch', flexShrink: 0, flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
+        <div style={{ padding: isMobile ? '12px 16px' : '24px 20px 20px', borderBottom: isMobile ? 'none' : '1px solid #1a1a1a', borderRight: isMobile ? '1px solid #1a1a1a' : 'none' }}>
           <div style={{ fontFamily: 'Playfair Display', fontSize: 18, color: '#F0EDE8', letterSpacing: '0.05em' }}>Prime Touch</div>
           <div style={{ fontSize: 10, color: '#333', marginTop: 4, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Admin</div>
         </div>
-        <nav style={{ padding: '12px 10px', flex: 1 }}>
+        <nav style={{ padding: isMobile ? '8px' : '12px 10px', flex: 1, display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: isMobile ? 4 : 0, overflowX: isMobile ? 'auto' : 'visible' }}>
           {[['orders','Orders',stats.active],['clients','Clients',null],['deliveries','Deliveries',null]].map(([id,label,badge]) => (
             <button key={id} onClick={() => { setTab(id); setSelected(null); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '9px 10px', background: tab === id ? '#161616' : 'none', border: 'none', color: tab === id ? '#F0EDE8' : '#555', fontSize: 13, textAlign: 'left', marginBottom: 2, letterSpacing: '0.02em', transition: 'color 0.15s' }}>
               {label}
@@ -243,9 +337,9 @@ function App() {
             </button>
           ))}
         </nav>
-        <div style={{ padding: '16px 20px', borderTop: '1px solid #1a1a1a' }}>
+        {!isMobile && <div style={{ padding: '16px 20px', borderTop: '1px solid #1a1a1a' }}>
           <button onClick={() => { sessionStorage.removeItem('ptAuth'); setAuth(false); }} style={{ background: 'none', border: 'none', color: '#333', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Sign out</button>
-        </div>
+        </div>}
       </div>
 
       {/* Main */}
@@ -271,7 +365,7 @@ function App() {
 
         {/* Stats bar (orders tab only) */}
         {tab === 'orders' && (
-          <div style={{ display: 'flex', gap: 1, padding: '0', flexShrink: 0, borderBottom: '1px solid #1a1a1a' }}>
+          <div style={{ display: 'flex', flexWrap: isMobile ? 'wrap' : 'nowrap', gap: 1, padding: '0', flexShrink: 0, borderBottom: '1px solid #1a1a1a' }}>
             {[
               ['Active orders', stats.active, '#C9A96E'],
               ['Due ≤2 days', stats.urgent, stats.urgent > 0 ? '#E07070' : '#555'],
@@ -430,6 +524,7 @@ function App() {
 }
 
 function OrderPanel({ order, deliveries, onUpdate, onDelete, onClose, onCreateDelivery, onUploadFiles, onRemoveFile, onCopyLink, copiedLink, uploadProgress, clientPortalUrl }) {
+  const isM = useIsMobile();
   const [editing, setEditing] = React.useState(false);
   const [form, setForm] = React.useState({ ...order });
   const [creatingDelivery, setCreatingDelivery] = React.useState(false);
@@ -464,7 +559,8 @@ function OrderPanel({ order, deliveries, onUpdate, onDelete, onClose, onCreateDe
   const days = order.deadline ? Math.ceil((new Date(order.deadline) - new Date()) / 86400000) : null;
 
   return (
-    <div style={{ width: 340, borderLeft: '1px solid #1a1a1a', display: 'flex', flexDirection: 'column', overflowY: 'auto', background: '#0a0a0a', flexShrink: 0 }}>
+    return (
+    <div style={{ width: isM ? '100%' : 340, position: isM ? 'fixed' : 'relative', inset: isM ? 0 : 'auto', zIndex: isM ? 50 : 'auto', borderLeft: isM ? 'none' : '1px solid #1a1a1a', display: 'flex', flexDirection: 'column', overflowY: 'auto', background: '#0a0a0a', flexShrink: 0 }}>
       <div style={{ padding: '16px 20px', borderBottom: '1px solid #1a1a1a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ fontSize: 13, fontWeight: 500 }}>Order detail</div>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -649,6 +745,13 @@ function NewOrderModal({ onCreate, onClose }) {
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js').then(r=>console.log('SW registered')).catch(e=>console.log('SW error',e));
+  });
+}
 </script>
 </body>
 </html>
