@@ -8,7 +8,14 @@
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  window.supabaseClient = createClient(
+    "https://lrkmmjcqsfyqiijwuwgb.supabase.co",
+    "sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg"
+  );
+  window.dispatchEvent(new Event('supabase-ready'));
+</script>
 <style>body{margin:0;background:#0D0D0D}
 #lockScreen{position:fixed;inset:0;background:#0D0D0D;display:flex;align-items:center;justify-content:center;z-index:9999;font-family:'Inter',sans-serif}
 #lockScreen.hidden{display:none}
@@ -60,7 +67,6 @@ const { useState, useEffect, useMemo } = React;
 
 const SUPABASE_URL = "https://lrkmmjcqsfyqiijwuwgb.supabase.co";
 const SUPABASE_KEY = "sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STATUS = {
   new: { label: 'New', color: '#7C9CBF', bg: 'rgba(124,156,191,0.12)' },
@@ -96,6 +102,7 @@ export default function App() {
 
   async function loadOrders() {
     setLoading(true);
+    const supabase = window.supabaseClient;
     const { data, error } = await supabase.from('orders').select('*').order('inserted_at', { ascending: false });
     if (error) {
       showToast('Failed to load orders');
@@ -111,7 +118,13 @@ export default function App() {
     setLoading(false);
   }
 
-  useEffect(() => { loadOrders(); }, []);
+  useEffect(() => {
+    if (window.supabaseClient) {
+      loadOrders();
+    } else {
+      window.addEventListener('supabase-ready', loadOrders, { once: true });
+    }
+  }, []);
 
   function showToast(msg) {
     setToast(msg);
@@ -120,7 +133,7 @@ export default function App() {
 
   async function updateStatus(id, status) {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-    const { error } = await supabase.from('orders').update({ status }).eq('id', id);
+    const { error } = await window.supabaseClient.from('orders').update({ status }).eq('id', id);
     if (error) { showToast('Failed to update'); console.error(error); }
     else showToast(`Marked as ${STATUS[status].label}`);
   }
@@ -128,7 +141,7 @@ export default function App() {
   async function addOrder(order) {
     const newId = 'ORD-' + (1000 + orders.length + Math.floor(Math.random() * 900));
     const newOrder = { ...order, id: newId, created: new Date().toISOString().slice(0, 10), status: 'new' };
-    const { error } = await supabase.from('orders').insert([newOrder]);
+    const { error } = await window.supabaseClient.from('orders').insert([newOrder]);
     if (error) { showToast('Failed to create order'); console.error(error); return; }
     setOrders(prev => [newOrder, ...prev]);
     setShowNewOrder(false);
@@ -136,7 +149,7 @@ export default function App() {
   }
 
   async function deleteOrder(id) {
-    const { error } = await supabase.from('orders').delete().eq('id', id);
+    const { error } = await window.supabaseClient.from('orders').delete().eq('id', id);
     if (error) { showToast('Failed to delete'); console.error(error); return; }
     setOrders(prev => prev.filter(o => o.id !== id));
     setSelectedOrder(null);
