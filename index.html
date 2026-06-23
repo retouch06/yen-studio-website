@@ -26,9 +26,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:fl
 nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-color:var(--border)}
 .logo{font-family:'Playfair Display',serif;font-size:22px;letter-spacing:.04em;color:var(--text);text-decoration:none}
 .logo span{color:var(--gold)}
-.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links{display:flex;gap:36px;list-style:none;align-items:center}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:color .2s}
 .nav-links a:hover{color:var(--text)}
+.nav-links .portal-link{color:var(--gold);border:1px solid rgba(201,169,110,.3);padding:6px 14px;border-radius:100px;transition:all .2s}
+.nav-links .portal-link:hover{background:rgba(201,169,110,.1);color:var(--gold2);border-color:var(--gold)}
 .nav-cta{background:var(--gold);color:#0D0D0D;padding:10px 24px;border-radius:100px;font-size:13px;font-weight:500;text-decoration:none;letter-spacing:.04em;transition:all .2s}
 .nav-cta:hover{background:var(--gold2)}
 .lang-switch{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:100px;padding:4px;margin-left:8px}
@@ -56,25 +58,19 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
 .btn-outline{border:1px solid var(--border);color:var(--text);padding:14px 32px;border-radius:100px;font-size:14px;text-decoration:none;letter-spacing:.04em;transition:all .2s}
 .btn-outline:hover{border-color:var(--muted)}
-.scroll-hint{display: none !important;}
-.scroll-line{display: none !important;}
-@keyframes scrollpulse{0%,100%{opacity:.4}50%{opacity:1}}
+.scroll-hint{display:none!important}
+.scroll-line{display:none!important}
 
 /* BEFORE/AFTER SLIDER */
 .slider-section{padding:0 24px 80px;display:flex;flex-direction:column;align-items:center}
-.slider-label{display: none !important;}
+.slider-label{display:none!important}
 .ba-container{position:relative;width:100%;max-width:820px;aspect-ratio:3/2;border-radius:var(--r);overflow:hidden;cursor:ew-resize;user-select:none;border:1px solid var(--border)}
 .ba-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .ba-after{position:absolute;inset:0;overflow:hidden;width:50%}
 .ba-after img{position:absolute;top:0;left:0;width:100%;max-width:820px;height:100%;object-fit:cover}
-.ba-divider{display: none !important;}
-.ba-handle{display: none !important;}
-.ba-handle svg{width:20px;height:20px;fill:#0D0D0D}
-.ba-tag{display: none !important;}
-.ba-tag.before{left:16px;background:rgba(0,0,0,.6);color:var(--muted);border:1px solid var(--border)}
-.ba-tag.after{right:16px;background:rgba(201,169,110,.15);color:var(--gold);border:1px solid rgba(201,169,110,.3)}
-
-/* Make BA slider show placeholder gradient when no real image */
+.ba-divider{display:none!important}
+.ba-handle{display:none!important}
+.ba-tag{display:none!important}
 .ba-before-fill{position:absolute;inset:0;background:linear-gradient(135deg,#1a1410 0%,#2d2015 50%,#1a1410 100%)}
 .ba-after-fill{position:absolute;inset:0;background:linear-gradient(135deg,#0d0d0d 0%,#1a1410 40%,#2a1d0e 100%)}
 
@@ -206,6 +202,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 .mobile-menu.open{display:flex}
 .mobile-menu a{font-family:'Playfair Display',serif;font-size:28px;color:var(--text);text-decoration:none}
 .mobile-menu a:hover{color:var(--gold)}
+.mobile-menu .portal-mobile{font-size:16px!important;color:var(--gold)!important;border:1px solid rgba(201,169,110,.3);padding:10px 28px;border-radius:100px;font-family:'Inter',sans-serif!important;letter-spacing:.08em;text-transform:uppercase}
 
 /* REVEAL ANIMATION */
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease}
@@ -215,12 +212,13 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 <body>
 
 <nav id="nav">
-  <a href="#" class="logo">Prime Touch
+  <a href="#" class="logo">Prime Touch</a>
   <ul class="nav-links">
     <li><a href="#services" data-en="Services" data-vi="Dịch vụ">Services</a></li>
     <li><a href="#portfolio" data-en="Portfolio" data-vi="Portfolio">Portfolio</a></li>
     <li><a href="#pricing" data-en="Pricing" data-vi="Bảng giá">Pricing</a></li>
     <li><a href="#contact" data-en="Contact" data-vi="Liên hệ">Contact</a></li>
+    <li><a href="/client.html" class="portal-link" data-en="Client portal" data-vi="Cổng khách hàng">Client portal</a></li>
   </ul>
   <div class="nav-right">
     <a href="#contact" class="nav-cta nav-cta-wrap" data-en="Book now" data-vi="Đặt lịch ngay">Book now</a>
@@ -239,6 +237,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
   <a href="#portfolio" onclick="toggleMenu()" data-en="Portfolio" data-vi="Portfolio">Portfolio</a>
   <a href="#pricing" onclick="toggleMenu()" data-en="Pricing" data-vi="Bảng giá">Pricing</a>
   <a href="#contact" onclick="toggleMenu()" data-en="Contact" data-vi="Liên hệ">Contact</a>
+  <a href="/client.html" class="portal-mobile" data-en="Client portal" data-vi="Cổng khách hàng">Client portal</a>
   <a href="#contact" class="btn-primary" onclick="toggleMenu()" data-en="Book now" data-vi="Đặt lịch ngay">Book now</a>
   <div class="lang-switch" style="margin-top:8px">
     <button class="lang-btn active" id="langENm" onclick="setLang('en')">EN</button>
@@ -249,24 +248,17 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 <!-- HERO -->
 <section class="hero">
   <p class="hero-eyebrow reveal" data-en="Freelance photo retouching · Vietnam" data-vi="Freelance photo retouching · HCMC">Freelance photo retouching · Vietnam</p>
-  <h1 class="hero-title reveal" data-en-html="Beautiful photos start with professional <em>retouching</em>" data-vi-html="Ảnh đẹp hơn bắt đầu từ <em>hậu kỳ</em> chuPrime Touch nghiệp">Beautiful photos start with professional <em>retouching</em></h1>
-  <p class="hero-sub reveal" data-en="Portrait · product · fashion retouching with high-end skill and a studio-grade workflow, for clients worldwide." data-vi="Portrait · Product · Fashion retouching với tay nghề cao và quy trình làm việc chuPrime Touch nghiệp như studio lớn.">Portrait · product · fashion retouching with high-end skill and a studio-grade workflow, for clients worldwide.</p>
+  <h1 class="hero-title reveal" data-en-html="Beautiful photos start with professional <em>retouching</em>" data-vi-html="Ảnh đẹp hơn bắt đầu từ <em>hậu kỳ</em> chuyên nghiệp">Beautiful photos start with professional <em>retouching</em></h1>
+  <p class="hero-sub reveal" data-en="Portrait · product · fashion retouching with high-end skill and a studio-grade workflow, for clients worldwide." data-vi="Portrait · Product · Fashion retouching với tay nghề cao và quy trình làm việc chuyên nghiệp như studio lớn.">Portrait · product · fashion retouching with high-end skill and a studio-grade workflow, for clients worldwide.</p>
   <div class="hero-actions reveal">
     <a href="#portfolio" class="btn-primary" data-en="View portfolio" data-vi="Xem portfolio">View portfolio</a>
     <a href="#pricing" class="btn-outline" data-en="See pricing" data-vi="Xem bảng giá">See pricing</a>
-  </div>
-  <div class="scroll-hint">
-    <div class="scroll-line"></div>
-    <span data-en="Scroll" data-vi="Kéo xuống">Scroll</span>
   </div>
 </section>
 
 <!-- BEFORE/AFTER -->
 <section class="slider-section">
-  <p class="slider-label reveal" data-en="Before & after — drag to compare" data-vi="Trước &amp; sau retouch — kéo để so sánh">Before &amp; after — drag to compare</p>
-  <div style="text-align: center; font-family: 'Playfair Display', serif; letter-spacing: 0.2em; color: var(--gold); margin-bottom: 24px; font-size: 14px; text-transform: uppercase;">
-    BEFORE / AFTER
-</div>
+  <div style="text-align:center;font-family:'Playfair Display',serif;letter-spacing:.2em;color:var(--gold);margin-bottom:24px;font-size:14px;text-transform:uppercase;">BEFORE / AFTER</div>
   <div class="ba-container reveal" id="baContainer">
     <img class="ba-img" src="images/tambefore.jpg" alt="Original unedited photo">
     <div class="ba-after" id="baAfter">
@@ -306,7 +298,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 
 <!-- SERVICES -->
 <section class="section" id="services">
-  <p class="section-eyebrow reveal" data-en="Expertise" data-vi="ChuPrime Touch môn">Expertise</p>
+  <p class="section-eyebrow reveal" data-en="Expertise" data-vi="Chuyên môn">Expertise</p>
   <h2 class="section-title reveal" data-en-html="Full-range retouch <em style=\"font-family:'Playfair Display',serif;font-style:italic\">services</em>" data-vi-html="Dịch vụ retouch <em style=\"font-family:'Playfair Display',serif;font-style:italic\">toàn diện</em>">Full-range retouch <em style="font-family:'Playfair Display',serif;font-style:italic">services</em></h2>
   <div class="services-grid reveal">
     <div class="service-card">
@@ -361,57 +353,27 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
   <div class="portfolio-grid reveal" id="portfolioGrid">
     <div class="portfolio-item" data-cat="portrait">
       <div class="portfolio-placeholder pi-1"></div>
-      <div class="portfolio-overlay">
-        <div class="portfolio-meta">
-          <p class="portfolio-cat" data-en="Portrait" data-vi="Portrait">Portrait</p>
-          <p class="portfolio-title" data-en="Natural skin retouching" data-vi="Natural skin retouching">Natural skin retouching</p>
-        </div>
-      </div>
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Portrait" data-vi="Portrait">Portrait</p><p class="portfolio-title" data-en="Natural skin retouching" data-vi="Natural skin retouching">Natural skin retouching</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="product">
       <div class="portfolio-placeholder pi-2"></div>
-      <div class="portfolio-overlay">
-        <div class="portfolio-meta">
-          <p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p>
-          <p class="portfolio-title" data-en="Skincare campaign" data-vi="Skincare campaign">Skincare campaign</p>
-        </div>
-      </div>
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Skincare campaign" data-vi="Skincare campaign">Skincare campaign</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="fashion">
       <div class="portfolio-placeholder pi-3"></div>
-      <div class="portfolio-overlay">
-        <div class="portfolio-meta">
-          <p class="portfolio-cat" data-en="Fashion" data-vi="Fashion">Fashion</p>
-          <p class="portfolio-title" data-en="Editorial lookbook" data-vi="Editorial lookbook">Editorial lookbook</p>
-        </div>
-      </div>
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Fashion" data-vi="Fashion">Fashion</p><p class="portfolio-title" data-en="Editorial lookbook" data-vi="Editorial lookbook">Editorial lookbook</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="fashion">
       <img src="images/tuiafter.jpg" alt="Jewelry collection retouch" style="width:100%;height:100%;object-fit:cover">
-      <div class="portfolio-overlay">
-        <div class="portfolio-meta">
-          <p class="portfolio-cat" data-en="Fashion" data-vi="Fashion">Fashion</p>
-          <p class="portfolio-title" data-en="Studio/E-commerce" data-vi="Studio/E-commerce">Studio/E-commerce</p>
-        </div>
-      </div>
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Fashion" data-vi="Fashion">Fashion</p><p class="portfolio-title" data-en="Studio/E-commerce" data-vi="Studio/E-commerce">Studio/E-commerce</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="product">
       <img src="images/tamafter.jpg" alt="Jewelry collection retouch" style="width:100%;height:100%;object-fit:cover">
-      <div class="portfolio-overlay">
-        <div class="portfolio-meta">
-          <p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p>
-          <p class="portfolio-title" data-en="Jewelry collection" data-vi="Jewelry collection">Jewelry collection</p>
-        </div>
-      </div>
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Jewelry collection" data-vi="Jewelry collection">Jewelry collection</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="portrait">
       <div class="portfolio-placeholder pi-6"></div>
-      <div class="portfolio-overlay">
-        <div class="portfolio-meta">
-          <p class="portfolio-cat" data-en="Portrait" data-vi="Portrait">Portrait</p>
-          <p class="portfolio-title" data-en="Corporate headshots" data-vi="Corporate headshots">Corporate headshots</p>
-        </div>
-      </div>
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Portrait" data-vi="Portrait">Portrait</p><p class="portfolio-title" data-en="Corporate headshots" data-vi="Corporate headshots">Corporate headshots</p></div></div>
     </div>
   </div>
 </section>
@@ -419,7 +381,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 <!-- PROCESS -->
 <section class="process-section">
   <p class="section-eyebrow reveal" data-en="Process" data-vi="Quy trình">Process</p>
-  <h2 class="section-title reveal" data-en="Simple, professional workflow" data-vi="Làm việc đơn giản &amp; chuPrime Touch nghiệp">Simple, professional workflow</h2>
+  <h2 class="section-title reveal" data-en="Simple, professional workflow" data-vi="Làm việc đơn giản & chuyên nghiệp">Simple, professional workflow</h2>
   <div class="process-steps">
     <div class="process-step reveal">
       <div class="step-num">1</div>
@@ -447,7 +409,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 <!-- PRICING -->
 <section class="pricing-section" id="pricing">
   <p class="section-eyebrow reveal" data-en="Pricing" data-vi="Bảng giá">Pricing</p>
-  <h2 class="section-title reveal" data-en="Transparent & flexible" data-vi="Minh bạch &amp; linh hoạt">Transparent &amp; flexible</h2>
+  <h2 class="section-title reveal" data-en="Transparent & flexible" data-vi="Minh bạch & linh hoạt">Transparent & flexible</h2>
   <div class="pricing-grid reveal">
     <div class="pricing-card">
       <p class="pricing-name" data-en="Basic" data-vi="Basic">Basic</p>
@@ -456,7 +418,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
       <ul class="pricing-features">
         <li class="included" data-en="Basic retouching" data-vi="Retouch cơ bản">Basic retouching</li>
         <li class="included" data-en="Simple background removal" data-vi="Xóa nền đơn giản">Simple background removal</li>
-        <li class="included" data-en="Light & color correction" data-vi="Chỉnh sáng &amp; màu">Light & color correction</li>
+        <li class="included" data-en="Light & color correction" data-vi="Chỉnh sáng & màu">Light & color correction</li>
         <li data-en="Advanced color grading" data-vi="Color grading nâng cao">Advanced color grading</li>
         <li data-en="Unlimited revisions" data-vi="Chỉnh sửa không giới hạn">Unlimited revisions</li>
         <li data-en="12h express delivery" data-vi="Giao hàng express 12h">12h express delivery</li>
@@ -469,7 +431,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
       <p class="pricing-price"><span data-en="$" data-vi="đ">$</span><span data-en="5" data-vi="120k">5</span></p>
       <p class="pricing-unit" data-en="per photo" data-vi="mỗi ảnh">per photo</p>
       <ul class="pricing-features">
-        <li class="included" data-en="In-depth retouching" data-vi="Retouch chuPrime Touch sâu">In-depth retouching</li>
+        <li class="included" data-en="In-depth retouching" data-vi="Retouch chuyên sâu">In-depth retouching</li>
         <li class="included" data-en="Complex background removal" data-vi="Xóa nền phức tạp">Complex background removal</li>
         <li class="included" data-en="Color grading" data-vi="Color grading">Color grading</li>
         <li class="included" data-en="1 free revision" data-vi="1 lần chỉnh sửa miễn phí">1 free revision</li>
@@ -484,7 +446,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
       <p class="pricing-unit" data-en="per photo" data-vi="mỗi ảnh">per photo</p>
       <ul class="pricing-features">
         <li class="included" data-en="High-end retouching" data-vi="High-end retouching">High-end retouching</li>
-        <li class="included" data-en="Composite & creative work" data-vi="Composite &amp; creative">Composite & creative work</li>
+        <li class="included" data-en="Composite & creative work" data-vi="Composite & creative">Composite & creative work</li>
         <li class="included" data-en="Premium color grading" data-vi="Color grading cao cấp">Premium color grading</li>
         <li class="included" data-en="Unlimited revisions" data-vi="Chỉnh sửa không giới hạn">Unlimited revisions</li>
         <li class="included" data-en="12h express delivery" data-vi="Giao hàng express 12h">12h express delivery</li>
@@ -502,34 +464,16 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
   <h2 class="section-title reveal" data-en="What clients say" data-vi="Khách hàng nói gì">What clients say</h2>
   <div class="testimonials-grid">
     <div class="testimonial reveal">
-      <p class="testimonial-text" data-en="My wedding photos were retouched beautifully and naturally. Colors looked great without feeling fake. Fast and professional turnaround." data-vi="Ảnh cưới của mình được retouch cực kỳ tự nhiên, màu sắc đẹp mà không bị giả. Làm việc rất nhanh và chuPrime Touch nghiệp.">My wedding photos were retouched beautifully and naturally. Colors looked great without feeling fake. Fast and professional turnaround.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">LN</div>
-        <div>
-          <p class="author-name" data-en="Linh Nguyen" data-vi="Linh Nguyễn">Linh Nguyen</p>
-          <p class="author-role" data-en="Bride · Ho Chi Minh City" data-vi="Cô dâu · TP.HCM">Bride · Ho Chi Minh City</p>
-        </div>
-      </div>
+      <p class="testimonial-text" data-en="My wedding photos were retouched beautifully and naturally. Colors looked great without feeling fake. Fast and professional turnaround." data-vi="Ảnh cưới của mình được retouch cực kỳ tự nhiên, màu sắc đẹp mà không bị giả. Làm việc rất nhanh và chuyên nghiệp.">My wedding photos were retouched beautifully and naturally. Colors looked great without feeling fake. Fast and professional turnaround.</p>
+      <div class="testimonial-author"><div class="author-avatar">LN</div><div><p class="author-name" data-en="Linh Nguyen" data-vi="Linh Nguyễn">Linh Nguyen</p><p class="author-role" data-en="Bride · Ho Chi Minh City" data-vi="Cô dâu · TP.HCM">Bride · Ho Chi Minh City</p></div></div>
     </div>
     <div class="testimonial reveal">
       <p class="testimonial-text" data-en="Our shop uses the product photo service every month. High-quality images, always on time, and competitive pricing." data-vi="Shop mình dùng dịch vụ product photo hàng tháng. Ảnh sản phẩm chất lượng cao, giao đúng hạn, giá cạnh tranh.">Our shop uses the product photo service every month. High-quality images, always on time, and competitive pricing.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">MT</div>
-        <div>
-          <p class="author-name" data-en="Minh Tran" data-vi="Minh Trần">Minh Tran</p>
-          <p class="author-role" data-en="Online shop owner · Hanoi" data-vi="Chủ shop online · Hà Nội">Online shop owner · Hanoi</p>
-        </div>
-      </div>
+      <div class="testimonial-author"><div class="author-avatar">MT</div><div><p class="author-name" data-en="Minh Tran" data-vi="Minh Trần">Minh Tran</p><p class="author-role" data-en="Online shop owner · Hanoi" data-vi="Chủ shop online · Hà Nội">Online shop owner · Hanoi</p></div></div>
     </div>
     <div class="testimonial reveal">
-      <p class="testimonial-text" data-en="Our summer lookbook was retouched beautifully — consistent, editorial tone throughout. We'll definitely keep working together." data-vi="Lookbook mùa hè của brand được Prime Touch retouch rất đẹp, tone màu nhất quán và editorial. Sẽ tiếp tục hợp tác lâu dài.">Our summer lookbook was retouched beautifully — consistent, editorial tone throughout. We'll definitely keep working together.</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">TP</div>
-        <div>
-          <p class="author-name" data-en="Thanh Phuong" data-vi="Thanh Phương">Thanh Phuong</p>
-          <p class="author-role" data-en="Fashion designer · Ho Chi Minh City" data-vi="Fashion designer · TP.HCM">Fashion designer · Ho Chi Minh City</p>
-        </div>
-      </div>
+      <p class="testimonial-text" data-en="Our summer lookbook was retouched beautifully — consistent, editorial tone throughout. We'll definitely keep working together." data-vi="Lookbook mùa hè của brand được retouch rất đẹp, tone màu nhất quán và editorial. Sẽ tiếp tục hợp tác lâu dài.">Our summer lookbook was retouched beautifully — consistent, editorial tone throughout. We'll definitely keep working together.</p>
+      <div class="testimonial-author"><div class="author-avatar">TP</div><div><p class="author-name" data-en="Thanh Phuong" data-vi="Thanh Phương">Thanh Phuong</p><p class="author-role" data-en="Fashion designer · Ho Chi Minh City" data-vi="Fashion designer · TP.HCM">Fashion designer · Ho Chi Minh City</p></div></div>
     </div>
   </div>
 </section>
@@ -563,19 +507,10 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
       </div>
       <div class="reveal">
         <div class="form-row">
-          <div class="form-group">
-            <label data-en="Full name" data-vi="Họ và tên">Full name</label>
-            <input type="text" placeholder="Jane Doe">
-          </div>
-          <div class="form-group">
-            <label data-en="Phone / WhatsApp" data-vi="Số điện thoại">Phone / WhatsApp</label>
-            <input type="tel" placeholder="+1 555 123 4567">
-          </div>
+          <div class="form-group"><label data-en="Full name" data-vi="Họ và tên">Full name</label><input type="text" placeholder="Jane Doe"></div>
+          <div class="form-group"><label data-en="Phone / WhatsApp" data-vi="Số điện thoại">Phone / WhatsApp</label><input type="tel" placeholder="+1 555 123 4567"></div>
         </div>
-        <div class="form-group">
-          <label data-en="Email" data-vi="Email">Email</label>
-          <input type="email" placeholder="email@example.com">
-        </div>
+        <div class="form-group"><label data-en="Email" data-vi="Email">Email</label><input type="email" placeholder="email@example.com"></div>
         <div class="form-group">
           <label data-en="Service type" data-vi="Loại dịch vụ">Service type</label>
           <select>
@@ -589,19 +524,10 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
           </select>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label data-en="Number of photos" data-vi="Số lượng ảnh">Number of photos</label>
-            <input type="number" placeholder="e.g. 20">
-          </div>
-          <div class="form-group">
-            <label data-en="Preferred deadline" data-vi="Deadline mong muốn">Preferred deadline</label>
-            <input type="date">
-          </div>
+          <div class="form-group"><label data-en="Number of photos" data-vi="Số lượng ảnh">Number of photos</label><input type="number" placeholder="e.g. 20"></div>
+          <div class="form-group"><label data-en="Preferred deadline" data-vi="Deadline mong muốn">Preferred deadline</label><input type="date"></div>
         </div>
-        <div class="form-group">
-          <label data-en="Project details" data-vi="Mô tả yêu cầu">Project details</label>
-          <textarea placeholder="Describe the style, color tone you're after, or paste a reference link..." data-en-ph="Describe the style, color tone you're after, or paste a reference link..." data-vi-ph="Mô tả chi tiết phong cách, tone màu mong muốn, hoặc đính kèm link tham khảo..."></textarea>
-        </div>
+        <div class="form-group"><label data-en="Project details" data-vi="Mô tả yêu cầu">Project details</label><textarea placeholder="Describe the style, color tone you're after, or paste a reference link..." data-en-ph="Describe the style, color tone you're after, or paste a reference link..." data-vi-ph="Mô tả chi tiết phong cách, tone màu mong muốn, hoặc đính kèm link tham khảo..."></textarea></div>
         <button class="btn-submit" onclick="handleSubmit()" data-en="Send quote request" data-vi="Gửi yêu cầu báo giá">Send quote request</button>
         <p class="form-note" data-en="I'll get back to you within 2 business hours" data-vi="Mình sẽ phản hồi trong vòng 2 giờ làm việc">I'll get back to you within 2 business hours</p>
       </div>
@@ -616,6 +542,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
     <a href="#portfolio" data-en="Portfolio" data-vi="Portfolio">Portfolio</a>
     <a href="#pricing" data-en="Pricing" data-vi="Bảng giá">Pricing</a>
     <a href="#contact" data-en="Contact" data-vi="Liên hệ">Contact</a>
+    <a href="/client.html" data-en="Client portal" data-vi="Cổng khách hàng">Client portal</a>
   </div>
 </footer>
 
@@ -623,7 +550,6 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 window.addEventListener('scroll',()=>{
   document.getElementById('nav').classList.toggle('scrolled',scrollY>60);
 });
-
 const obs=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}});
 },{threshold:.12});
@@ -637,8 +563,9 @@ function setPct(x){
   const r=bc.getBoundingClientRect();
   let p=Math.max(5,Math.min(95,((x-r.left)/r.width)*100));
   ba.style.width=p+'%';
-  bd.style.left=p+'%';
-  ba.querySelector('img').style.width=r.width+'px';
+  if(bd)bd.style.left=p+'%';
+  const img=ba.querySelector('img');
+  if(img)img.style.width=r.width+'px';
 }
 setPct({clientX:bc.getBoundingClientRect().left+bc.getBoundingClientRect().width/2});
 bc.addEventListener('mousedown',e=>{dragging=true;setPct(e.clientX)});
@@ -659,62 +586,38 @@ function filterPortfolio(cat,btn){
 function setLang(lang){
   document.documentElement.lang=lang;
   localStorage.setItem('lang',lang);
-  document.querySelectorAll('[data-'+lang+']').forEach(el=>{
-    el.textContent=el.getAttribute('data-'+lang);
-  });
-  document.querySelectorAll('[data-'+lang+'-html]').forEach(el=>{
-    el.innerHTML=el.getAttribute('data-'+lang+'-html');
-  });
-  document.querySelectorAll('[data-'+lang+'-ph]').forEach(el=>{
-    el.placeholder=el.getAttribute('data-'+lang+'-ph');
-  });
+  document.querySelectorAll('[data-'+lang+']').forEach(el=>{el.textContent=el.getAttribute('data-'+lang);});
+  document.querySelectorAll('[data-'+lang+'-html]').forEach(el=>{el.innerHTML=el.getAttribute('data-'+lang+'-html');});
+  document.querySelectorAll('[data-'+lang+'-ph]').forEach(el=>{el.placeholder=el.getAttribute('data-'+lang+'-ph');});
   ['langEN','langVI','langENm','langVIm'].forEach(id=>{
     const btn=document.getElementById(id);
-    if(btn) btn.classList.toggle('active', id.toLowerCase().includes(lang));
+    if(btn)btn.classList.toggle('active',id.toLowerCase().includes(lang));
   });
 }
 setLang('en');
 
-function toggleMenu(){
-  document.getElementById('mobileMenu').classList.toggle('open');
-}
+function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');}
 
 function handleSubmit(){
   const btn=event.target;
-  btn.textContent='Đang gửi...';
+  btn.textContent='Sending...';
   btn.disabled=true;
-  setTimeout(()=>{btn.textContent='Đã gửi! Mình sẽ liên hệ sớm ✓';btn.style.background='#2a5a2a';},1200);
+  setTimeout(()=>{btn.textContent='Sent! I\'ll be in touch soon ✓';btn.style.background='#2a5a2a';},1200);
 }
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const containers = document.querySelectorAll('.ba-container');
 
-    containers.forEach(container => {
-        const afterSection = container.querySelector('.ba-after');
-        // Tìm đến dòng chữ BEFORE / AFTER nằm ngay phía trên khung ảnh để điều khiển nó
-        const dynamicLabel = container.previousElementSibling; 
-        if (!afterSection) return;
-
-        let direction = 1;
-        let progress = 50;
-
-        setInterval(() => {
-            // Tăng/giảm tiến trình quét ảnh
-            progress += direction * 0.4; 
-            
-            // Cho phép quét kịch biên từ 0% đến 100% toàn bộ bức ảnh
-            if (progress >= 100) {
-                direction = -1;
-            } else if (progress <= 0) {
-                direction = 1;
-            }
-            
-            // Cập nhật chiều rộng ảnh đè lên
-            afterSection.style.width = `${progress}%`;
-    
-        }, 20);
-    });
+document.addEventListener("DOMContentLoaded",()=>{
+  const containers=document.querySelectorAll('.ba-container');
+  containers.forEach(container=>{
+    const afterSection=container.querySelector('.ba-after');
+    if(!afterSection)return;
+    let direction=1,progress=50;
+    setInterval(()=>{
+      progress+=direction*0.4;
+      if(progress>=100)direction=-1;
+      else if(progress<=0)direction=1;
+      afterSection.style.width=progress+'%';
+    },20);
+  });
 });
 </script>
 </body>
