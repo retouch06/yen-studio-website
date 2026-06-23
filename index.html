@@ -795,6 +795,12 @@ async function handleSubmit(){
     ['f-name','f-phone','f-email','f-photos','f-message'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     document.getElementById('f-service').selectedIndex=0;
     ['f-day','f-month','f-year'].forEach(id=>{document.getElementById(id).selectedIndex=0;});
+    // Send email notification
+    fetch('https://lrkmmjcqsfyqiijwuwgb.supabase.co/functions/v1/notify-new-order',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg'},
+      body:JSON.stringify({name,email,phone,service,photos,deadline,message})
+    }).catch(e=>console.log('Email notify error:',e));
   }catch(e){
     console.error('Submit error:',e);
     btn.textContent='Send quote request';
