@@ -165,7 +165,7 @@ function TokenView() {
     try {
       const d = await db.getDeliveryByToken(token);
       if (!d) { setError('Link not found or has expired.'); setLoading(false); return; }
-      if (d.expires_at && new Date(d.expires_at) < new Date()) { setError('This delivery link has expired. Please contact Prime Touch for a new link.'); setLoading(false); return; }
+      if (d.expires_at && new Date(d.expires_at) < new Date()) { setError('This delivery link has expired. Please contact us at ella.cassandra89@gmail.com for a new link.'); setLoading(false); return; }
       const o = await db.getOrder(d.order_id);
       setDelivery(d); setOrder(o);
     } catch(e) { setError('Something went wrong. Please try again.'); }
@@ -327,7 +327,7 @@ function TokenView() {
       )}
       <div style={{ marginTop: 60, paddingTop: 32, borderTop: '1px solid #1a1a1a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ color: '#444', fontSize: 12 }}>© Prime Touch — Professional Photo Retouching</div>
-        <div style={{ color: '#444', fontSize: 12 }}>Need revisions? Reply to your delivery email.</div>
+        <div style={{ color: '#444', fontSize: 12 }}>Need revisions? Contact: ella.cassandra89@gmail.com</div>
       </div>
     </div>
   );
