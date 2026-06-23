@@ -109,10 +109,30 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .portfolio-filters{display:flex;gap:8px;margin-bottom:48px;flex-wrap:wrap}
 .filter-btn{padding:8px 20px;border-radius:100px;border:1px solid var(--border);background:none;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
 .filter-btn.active,.filter-btn:hover{border-color:var(--gold);color:var(--gold)}
-.portfolio-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;max-width:900px}
-@media(max-width:600px){.portfolio-grid{grid-template-columns:1fr}}
-.portfolio-item{aspect-ratio:4/5;background:var(--bg3);border-radius:6px;overflow:hidden;position:relative;cursor:pointer}
-.portfolio-item:nth-child(1){grid-row:span 2;aspect-ratio:auto}
+.portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:1100px}
+@media(max-width:700px){.portfolio-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:420px){.portfolio-grid{grid-template-columns:1fr}}
+.portfolio-item{aspect-ratio:3/4;background:var(--bg3);border-radius:8px;overflow:hidden;position:relative;cursor:pointer;transition:transform .2s}
+.portfolio-item:hover{transform:scale(1.01)}
+.portfolio-item:nth-child(1){grid-row:span 1;aspect-ratio:3/4}
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{position:relative;width:100%;max-width:800px}
+.modal-close{position:absolute;top:-44px;right:0;background:none;border:1px solid rgba(255,255,255,.2);color:#F0EDE8;width:36px;height:36px;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
+.modal-close:hover{border-color:#C9A96E;color:#C9A96E}
+.modal-title{position:absolute;bottom:-40px;left:0;font-size:12px;color:#888;letter-spacing:.1em;text-transform:uppercase}
+/* Modal BA slider */
+.modal-ba{position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;cursor:ew-resize;user-select:none;border-radius:8px}
+.modal-ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.modal-ba-after{position:absolute;inset:0;overflow:hidden;width:50%}
+.modal-ba-after img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;max-width:none}
+.modal-ba-line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#C9A96E;transform:translateX(-50%);pointer-events:none}
+.modal-ba-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;background:#C9A96E;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+.modal-ba-handle svg{width:18px;height:18px;fill:#0D0D0D}
+.modal-ba-tag{position:absolute;bottom:14px;padding:4px 10px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:100px}
+.modal-ba-tag.before{left:14px;background:rgba(0,0,0,.6);color:#888;border:1px solid #2a2a2a}
+.modal-ba-tag.after{right:14px;background:rgba(201,169,110,.15);color:#C9A96E;border:1px solid rgba(201,169,110,.3)}
 
 .portfolio-item:hover .portfolio-overlay{opacity:1}
 .portfolio-overlay{position:absolute;inset:0;background:rgba(13,13,13,.7);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:24px;z-index:1}
@@ -224,7 +244,7 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
   .service-card{padding:28px 24px}
 
   /* Portfolio */
-  .portfolio-item:nth-child(1){grid-row:span 1;aspect-ratio:4/5}
+  .portfolio-item:nth-child(1){grid-row:span 1;aspect-ratio:3/4}
 
   /* Process */
   .process-step{display:flex;gap:16px;align-items:flex-start}
@@ -412,20 +432,40 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
   <h2 class="section-title reveal" data-en="Selected portfolio" data-vi="Portfolio nổi bật">Selected portfolio</h2>
   <div class="portfolio-filters reveal">
     <button class="filter-btn active" onclick="filterPortfolio('all',this)" data-en="All work" data-vi="Tất cả">All work</button>
-    <button class="filter-btn" onclick="filterPortfolio('product',this)" data-en="Product" data-vi="Product">Product</button>
+    <button class="filter-btn" onclick="filterPortfolio('accessories',this)" data-en="Accessories" data-vi="Phụ kiện">Accessories</button>
   </div>
   <div class="portfolio-grid reveal" id="portfolioGrid">
-    <div class="portfolio-item" data-cat="product">
-      <img src="images/tuiafter.jpg" alt="Studio E-commerce retouch" style="width:100%;height:100%;object-fit:cover">
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Studio / E-commerce" data-vi="Studio / E-commerce">Studio / E-commerce</p></div></div>
+    <div class="portfolio-item" data-cat="accessories" data-before="images/portfolio/accessories/acc-1-before.jpg" data-after="images/portfolio/accessories/acc-1-after.jpg" data-title="Accessories — No. 1" onclick="openModal(this)">
+      <img src="images/portfolio/accessories/acc-1-after.jpg" alt="Accessories retouch 1" style="width:100%;height:100%;object-fit:cover">
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat">Accessories</p><p class="portfolio-title">Product retouch · No.1</p></div></div>
     </div>
-    <div class="portfolio-item" data-cat="product">
-      <img src="images/tamafter.jpg" alt="Jewelry collection retouch" style="width:100%;height:100%;object-fit:cover">
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Jewelry collection" data-vi="Jewelry collection">Jewelry collection</p></div></div>
+    <div class="portfolio-item" data-cat="accessories" data-before="images/portfolio/accessories/acc-2-before.jpg" data-after="images/portfolio/accessories/acc-2-after.jpg" data-title="Accessories — No. 2" onclick="openModal(this)">
+      <img src="images/portfolio/accessories/acc-2-after.jpg" alt="Accessories retouch 2" style="width:100%;height:100%;object-fit:cover">
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat">Accessories</p><p class="portfolio-title">Product retouch · No.2</p></div></div>
     </div>
-    <div class="portfolio-item" data-cat="product">
-      <img src="images/tambefore.jpg" alt="Skincare product" style="width:100%;height:100%;object-fit:cover">
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Skincare campaign" data-vi="Skincare campaign">Skincare campaign</p></div></div>
+    <div class="portfolio-item" data-cat="accessories" data-before="images/portfolio/accessories/acc-3-before.jpg" data-after="images/portfolio/accessories/acc-3-after.jpg" data-title="Accessories — No. 3" onclick="openModal(this)">
+      <img src="images/portfolio/accessories/acc-3-after.jpg" alt="Accessories retouch 3" style="width:100%;height:100%;object-fit:cover">
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat">Accessories</p><p class="portfolio-title">Product retouch · No.3</p></div></div>
+    </div>
+  </div>
+
+  <!-- BA Modal -->
+  <div class="modal-overlay" id="baModal" onclick="closeModal(event)">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModalDirect()">×</button>
+      <div class="modal-ba" id="modalBA">
+        <img id="modalBefore" src="" alt="Before">
+        <div class="modal-ba-after" id="modalAfter">
+          <img id="modalAfterImg" src="" alt="After">
+        </div>
+        <div class="modal-ba-line" id="modalLine"></div>
+        <div class="modal-ba-handle" id="modalHandle">
+          <svg viewBox="0 0 24 24"><path d="M8 5l-5 7 5 7M16 5l5 7-5 7"/></svg>
+        </div>
+        <div class="modal-ba-tag before" data-en="Before" data-vi="Trước">Before</div>
+        <div class="modal-ba-tag after" data-en="After" data-vi="Sau">After</div>
+      </div>
+      <div class="modal-title" id="modalTitle"></div>
     </div>
   </div>
 </section>
@@ -720,6 +760,46 @@ async function handleSubmit(){
     btn.style.background='';
     alert('Something went wrong: '+e.message);
   }
+}
+
+// Portfolio modal BA slider
+let modalDragging = false;
+function openModal(el) {
+  const before = el.dataset.before;
+  const after = el.dataset.after;
+  const title = el.dataset.title || '';
+  document.getElementById('modalBefore').src = before;
+  document.getElementById('modalAfterImg').src = after;
+  document.getElementById('modalTitle').textContent = title;
+  const modal = document.getElementById('baModal');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // Reset slider to 50%
+  setTimeout(() => setModalPct(50), 50);
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('baModal')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('baModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function setModalPct(pct) {
+  pct = Math.max(5, Math.min(95, pct));
+  document.getElementById('modalAfter').style.width = pct + '%';
+  document.getElementById('modalLine').style.left = pct + '%';
+  document.getElementById('modalHandle').style.left = pct + '%';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+const mBA = document.getElementById('modalBA');
+if (mBA) {
+  mBA.addEventListener('mousedown', e => { modalDragging = true; const r = mBA.getBoundingClientRect(); setModalPct(((e.clientX - r.left) / r.width) * 100); });
+  mBA.addEventListener('touchstart', e => { modalDragging = true; const r = mBA.getBoundingClientRect(); setModalPct(((e.touches[0].clientX - r.left) / r.width) * 100); }, {passive:true});
+  window.addEventListener('mousemove', e => { if (!modalDragging) return; const r = mBA.getBoundingClientRect(); setModalPct(((e.clientX - r.left) / r.width) * 100); });
+  window.addEventListener('touchmove', e => { if (!modalDragging) return; const r = mBA.getBoundingClientRect(); setModalPct(((e.touches[0].clientX - r.left) / r.width) * 100); }, {passive:true});
+  window.addEventListener('mouseup', () => modalDragging = false);
+  window.addEventListener('touchend', () => modalDragging = false);
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
