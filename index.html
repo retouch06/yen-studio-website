@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="dns-prefetch" href="https://fonts.googleapis.com">
+<link rel="dns-prefetch" href="https://lrkmmjcqsfyqiijwuwgb.supabase.co">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- SEO -->
@@ -56,7 +58,10 @@
 <meta name="apple-mobile-web-app-title" content="Prime Touch">
 <link rel="apple-touch-icon" href="/icon-192.png">
 <title>Prime Touch</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"></noscript>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -71,12 +76,12 @@
   --r:12px;
 }
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-weight:300;line-height:1.6;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;font-weight:300;line-height:1.6;overflow-x:hidden}
 
 /* NAV */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:20px 48px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid transparent;transition:all .4s}
 nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-color:var(--border)}
-.logo{font-family:'Playfair Display',serif;font-size:22px;letter-spacing:.04em;color:var(--text);text-decoration:none}
+.logo{font-family:'Playfair Display',Georgia,serif;font-size:22px;letter-spacing:.04em;color:var(--text);text-decoration:none}
 .logo span{color:var(--gold)}
 .nav-links{display:flex;gap:36px;list-style:none;align-items:center}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:color .2s}
@@ -390,10 +395,10 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 <section class="slider-section">
   <div style="text-align:center;font-family:'Playfair Display',serif;letter-spacing:.2em;color:var(--gold);margin-bottom:24px;font-size:14px;text-transform:uppercase;">BEFORE / AFTER</div>
   <div class="ba-container reveal" id="baContainer">
-    <img class="ba-img" src="images/portfolio/accessories/acc-2-before.jpg" alt="Original unedited photo" style="width:100%;height:100%;object-fit:cover">
+    <img class="ba-img" src="images/portfolio/accessories/acc-2-before.jpg" alt="Original unedited photo" loading="eager" fetchpriority="high" width="820" height="547" style="width:100%;height:100%;object-fit:cover">
     <div class="ba-after" id="baAfter">
       <div style="position:absolute;inset:0;overflow:hidden">
-        <img src="images/portfolio/accessories/acc-2-after.jpg" alt="Retouched photo" id="baAfterImg" style="position:absolute;top:0;left:0;height:100%;width:820px;max-width:none;object-fit:cover">
+        <img src="images/portfolio/accessories/acc-2-after.jpg" alt="Retouched photo" id="baAfterImg" loading="eager" fetchpriority="high" style="position:absolute;top:0;left:0;height:100%;width:820px;max-width:none;object-fit:cover">
       </div>
     </div>
     <div class="ba-tag before" data-en="Before" data-vi="Trước">Before</div>
@@ -480,15 +485,15 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
   </div>
   <div class="portfolio-grid reveal" id="portfolioGrid">
     <div class="portfolio-item" data-cat="accessories" data-before="images/portfolio/accessories/acc-1-before.jpg" data-after="images/portfolio/accessories/acc-1-after.jpg" data-title="Accessories — No. 1" onclick="openModal(this)">
-      <img src="images/portfolio/accessories/acc-1-after.jpg" alt="Accessories retouch 1" style="width:100%;height:100%;object-fit:cover">
+      <img src="images/portfolio/accessories/acc-1-after.jpg" alt="Accessories retouch 1" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">
       <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat">Accessories</p><p class="portfolio-title">Product retouch · No.1</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="accessories" data-before="images/portfolio/accessories/acc-2-before.jpg" data-after="images/portfolio/accessories/acc-2-after.jpg" data-title="Accessories — No. 2" onclick="openModal(this)">
-      <img src="images/portfolio/accessories/acc-2-after.jpg" alt="Accessories retouch 2" style="width:100%;height:100%;object-fit:cover">
+      <img src="images/portfolio/accessories/acc-2-after.jpg" alt="Accessories retouch 2" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">
       <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat">Accessories</p><p class="portfolio-title">Product retouch · No.2</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="accessories" data-before="images/portfolio/accessories/acc-3-before.jpg" data-after="images/portfolio/accessories/acc-3-after.jpg" data-title="Accessories — No. 3" onclick="openModal(this)">
-      <img src="images/portfolio/accessories/acc-3-after.jpg" alt="Accessories retouch 3" style="width:100%;height:100%;object-fit:cover">
+      <img src="images/portfolio/accessories/acc-3-after.jpg" alt="Accessories retouch 3" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover">
       <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat">Accessories</p><p class="portfolio-title">Product retouch · No.3</p></div></div>
     </div>
   </div>
