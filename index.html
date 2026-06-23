@@ -597,11 +597,55 @@ setLang('en');
 
 function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');}
 
-function handleSubmit(){
+const SUPA_URL="https://lrkmmjcqsfyqiijwuwgb.supabase.co";
+const SUPA_KEY="sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg";
+
+async function handleSubmit(){
   const btn=event.target;
+  const name=document.getElementById('f-name').value.trim();
+  const email=document.getElementById('f-email').value.trim();
+  if(!name){alert('Please enter your name.');return;}
+  if(!email||!email.includes('@')){alert('Please enter a valid email.');return;}
   btn.textContent='Sending...';
   btn.disabled=true;
-  setTimeout(()=>{btn.textContent='Sent! I\'ll be in touch soon ✓';btn.style.background='#2a5a2a';},1200);
+  const phone=document.getElementById('f-phone').value.trim();
+  const service=document.getElementById('f-service').value;
+  const photos=parseInt(document.getElementById('f-photos').value)||0;
+  const day=document.getElementById('f-day').value;
+  const month=document.getElementById('f-month').value;
+  const year=document.getElementById('f-year').value;
+  const deadline=(day&&month&&year)?year+'-'+month+'-'+day.padStart(2,'0'):null;
+  const message=document.getElementById('f-message').value.trim();
+  const genId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  try{
+    const r1=await fetch(SUPA_URL+'/rest/v1/inquiries',{
+      method:'POST',
+      headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'return=representation'},
+      body:JSON.stringify({name,email,phone,service,photos,deadline,message})
+    });
+    const d1=await r1.json();
+    console.log('Inquiry:',r1.status,d1);
+    const orderData={id:genId(),client:name,email,service:service||'Not specified',photos:photos||0,price:0,status:'new',deadline:deadline||null,notes:message||'',created:new Date().toISOString().slice(0,10)};
+    const r2=await fetch(SUPA_URL+'/rest/v1/orders',{
+      method:'POST',
+      headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'return=representation'},
+      body:JSON.stringify(orderData)
+    });
+    const d2=await r2.json();
+    console.log('Order:',r2.status,d2);
+    if(!r2.ok){throw new Error('Order failed: '+JSON.stringify(d2));}
+    btn.textContent='Sent! I'll be in touch soon ✓';
+    btn.style.background='#2a5a2a';
+    ['f-name','f-phone','f-email','f-photos','f-message'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    document.getElementById('f-service').selectedIndex=0;
+    ['f-day','f-month','f-year'].forEach(id=>{document.getElementById(id).selectedIndex=0;});
+  }catch(e){
+    console.error('Submit error:',e);
+    btn.textContent='Send quote request';
+    btn.disabled=false;
+    btn.style.background='';
+    alert('Something went wrong: '+e.message);
+  }
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
