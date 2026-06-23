@@ -840,14 +840,6 @@ function openModal(el) {
   document.body.style.overflow = 'hidden';
   mPct = 50;
   setModalPct(mPct);
-  clearInterval(modalAutoTimer);
-  let dir = 1;
-  modalAutoTimer = setInterval(() => {
-    mPct += dir * 0.4;
-    if (mPct >= 95) dir = -1;
-    else if (mPct <= 5) dir = 1;
-    setModalPct(mPct);
-  }, 20);
 }
 function closeModal(e) {
   if (e.target === document.getElementById('baModal')) closeModalDirect();
