@@ -503,7 +503,20 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
         </div>
         <div class="form-row">
           <div class="form-group"><label data-en="Number of photos" data-vi="Số lượng ảnh">Number of photos</label><input id="f-photos" type="number" placeholder="e.g. 20"></div>
-          <div class="form-group"><label data-en="Preferred deadline" data-vi="Deadline mong muốn">Preferred deadline</label><input id="f-deadline" type="date"></div>
+          <div class="form-group">
+            <label data-en="Preferred deadline" data-vi="Deadline mong muốn">Preferred deadline</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+              <select id="f-day" style="text-align:center"><option value="">Day</option></select>
+              <select id="f-month" style="text-align:center">
+                <option value="">Month</option>
+                <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+                <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+                <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+                <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+              </select>
+              <select id="f-year" style="text-align:center"><option value="">Year</option></select>
+            </div>
+          </div>
         </div>
         <div class="form-group"><label data-en="Project details" data-vi="Mô tả yêu cầu">Project details</label><textarea id="f-message" placeholder="Describe the style, color tone you're after, or paste a reference link..." data-en-ph="Describe the style, color tone you're after, or paste a reference link..." data-vi-ph="Mô tả chi tiết phong cách, tone màu mong muốn, hoặc đính kèm link tham khảo..."></textarea></div>
         <button class="btn-submit" onclick="handleSubmit()" data-en="Send quote request" data-vi="Gửi yêu cầu báo giá">Send quote request</button>
@@ -573,6 +586,14 @@ function setLang(lang){
   });
 }
 setLang('en');
+
+// Populate day and year dropdowns
+(function(){
+  const dayEl=document.getElementById('f-day');
+  const yearEl=document.getElementById('f-year');
+  if(dayEl){for(let d=1;d<=31;d++){const o=document.createElement('option');o.value=String(d).padStart(2,'0');o.textContent=d;dayEl.appendChild(o);}}
+  if(yearEl){const yr=new Date().getFullYear();for(let y=yr;y<=yr+2;y++){const o=document.createElement('option');o.value=y;o.textContent=y;yearEl.appendChild(o);}}
+})();
 
 function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('open');}
 
