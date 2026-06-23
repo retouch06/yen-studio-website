@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prime Touch — Your Delivery</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0D0D0D; color: #F0EDE8; font-family: 'Inter', sans-serif; min-height: 100vh; }
+.logo { font-family: 'Playfair Display', serif; font-size: 22px; color: #C9A96E; letter-spacing: 0.05em; }
+.logo span { color: #F0EDE8; }
+.btn-gold { background: #C9A96E; color: #0D0D0D; border: none; padding: 12px 28px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+.btn-gold:hover { background: #E0C080; }
+.btn-outline { background: transparent; color: #C9A96E; border: 1px solid #C9A96E; padding: 10px 24px; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.btn-outline:hover { background: rgba(201,169,110,0.1); }
+input, textarea { background: #161616; border: 1px solid #2a2a2a; color: #F0EDE8; font-family: 'Inter', sans-serif; font-size: 14px; padding: 12px 16px; width: 100%; outline: none; transition: border-color 0.2s; }
+input:focus, textarea:focus { border-color: #C9A96E; }
+input::placeholder { color: #555; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const SUPABASE_URL = "https://lrkmmjcqsfyqiijwuwgb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_-ciMTY5GQVZa5VG1zGm4cQ_GJ-nO5Dg";
+
+const db = {
+  async getDeliveryByToken(token) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/deliveries?token=eq.${token}&select=*`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await r.json();
+    return data[0] || null;
+  },
+  async getOrder(id) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}&select=*`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await r.json();
+    return data[0] || null;
+  },
+  async incrementDownload(id) {
+    await fetch(`${SUPABASE_URL}/rest/v1/deliveries?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+      body: JSON.stringify({ download_count: null })
+    });
+  },
+  async registerClient(email, name) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/clients`, {
+      method: 'POST',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=representation' },
+      body: JSON.stringify({ email, name })
+    });
+    return r.ok;
+  },
+  async getClientByEmail(email) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/clients?email=eq.${encodeURIComponent(email)}&select=*`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await r.json();
+    return data[0] || null;
+  },
+  async getClientOrders(email) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/orders?email=eq.${encodeURIComponent(email)}&select=*&order=inserted_at.desc`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    return await r.json();
+  },
+  async getDeliveriesByOrderIds(orderIds) {
+    if (!orderIds.length) return [];
+    const filter = orderIds.map(id => `order_id=eq.${id}`).join(',');
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/deliveries?or=(${filter})&select=*`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    return await r.json();
+  }
+};
+
+const STATUS_LABEL = { new: 'New', in_progress: 'In progress', review: 'Review', done: 'Completed', delivered: 'Delivered' };
+const STATUS_COLOR = { new: '#555', in_progress: '#C9A96E', review: '#7EB8D4', done: '#6DBE8C', delivered: '#6DBE8C' };
+
+function Nav({ mode, onSwitchMode }) {
+  return (
+    <nav style={{ padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1a1a1a' }}>
+      <div className="logo">Prime<span>.Touch</span></div>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+        {mode === 'token' && (
+          <button className="btn-outline" onClick={() => onSwitchMode('login')} style={{ fontSize: 12, padding: '8px 18px' }}>
+            Client login
+          </button>
+        )}
+        {mode === 'login' && (
+          <button className="btn-outline" onClick={() => onSwitchMode('token')} style={{ fontSize: 12, padding: '8px 18px' }}>
+            I have a link
+          </button>
+        )}
+      </div>
+    </nav>
+  );
+}
+
+function TokenView() {
+  const [loading, setLoading] = React.useState(false);
+  const [delivery, setDelivery] = React.useState(null);
+  const [order, setOrder] = React.useState(null);
+  const [error, setError] = React.useState('');
+  const [tokenInput, setTokenInput] = React.useState('');
+  const [previewing, setPreviewing] = React.useState(null);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t = params.get('token');
+    if (t) { setTokenInput(t); loadDelivery(t); }
+  }, []);
+
+  async function loadDelivery(token) {
+    setLoading(true); setError('');
+    try {
+      const d = await db.getDeliveryByToken(token);
+      if (!d) { setError('Link not found or has expired.'); setLoading(false); return; }
+      if (d.expires_at && new Date(d.expires_at) < new Date()) { setError('This delivery link has expired. Please contact Prime Touch for a new link.'); setLoading(false); return; }
+      const o = await db.getOrder(d.order_id);
+      setDelivery(d); setOrder(o);
+    } catch(e) { setError('Something went wrong. Please try again.'); }
+    setLoading(false);
+  }
+
+  function formatDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  function isImage(url) {
+    return /\.(jpg|jpeg|png|webp|gif)$/i.test(url);
+  }
+
+  if (loading) return (
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16, padding: 80 }}>
+      <div style={{ width: 36, height: 36, border: '2px solid #2a2a2a', borderTop: '2px solid #C9A96E', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+      <div style={{ color: '#555', fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Loading your files</div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+
+  if (!delivery) return (
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+      <div style={{ maxWidth: 420, width: '100%' }}>
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ color: '#C9A96E', fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 12 }}>Delivery link</div>
+          <h1 style={{ fontFamily: 'Playfair Display', fontSize: 32, fontWeight: 400, lineHeight: 1.2, marginBottom: 12 }}>View your retouched files</h1>
+          <p style={{ color: '#888', fontSize: 14, lineHeight: 1.6 }}>Enter the delivery token from your email, or paste the full link.</p>
+        </div>
+        {error && <div style={{ background: 'rgba(220,60,60,0.1)', border: '1px solid rgba(220,60,60,0.3)', color: '#E07070', padding: '12px 16px', fontSize: 13, marginBottom: 20 }}>{error}</div>}
+        <div style={{ display: 'flex', gap: 0 }}>
+          <input value={tokenInput} onChange={e => setTokenInput(e.target.value)} placeholder="Paste token or full link..." onKeyDown={e => e.key === 'Enter' && loadDelivery(tokenInput.split('token=').pop())} style={{ flex: 1 }} />
+          <button className="btn-gold" onClick={() => loadDelivery(tokenInput.includes('token=') ? tokenInput.split('token=').pop() : tokenInput)} style={{ whiteSpace: 'nowrap' }}>View files</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const files = delivery.files || [];
+  const expiresIn = delivery.expires_at ? Math.ceil((new Date(delivery.expires_at) - new Date()) / 86400000) : null;
+
+  return (
+    <div style={{ maxWidth: 900, margin: '0 auto', padding: '48px 40px' }}>
+      {previewing && (
+        <div onClick={() => setPreviewing(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.92)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' }}>
+          <img src={previewing} alt="Preview" style={{ maxWidth: '90vw', maxHeight: '90vh', objectFit: 'contain' }} onClick={e => e.stopPropagation()} />
+          <button onClick={() => setPreviewing(null)} style={{ position: 'fixed', top: 24, right: 24, background: 'none', border: '1px solid #444', color: '#F0EDE8', width: 36, height: 36, cursor: 'pointer', fontSize: 18 }}>×</button>
+        </div>
+      )}
+
+      <div style={{ marginBottom: 40, paddingBottom: 32, borderBottom: '1px solid #1a1a1a' }}>
+        <div style={{ color: '#C9A96E', fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 12 }}>Your delivery is ready</div>
+        <h1 style={{ fontFamily: 'Playfair Display', fontSize: 36, fontWeight: 400, marginBottom: 8 }}>
+          {order ? order.client : 'Your retouched files'}
+        </h1>
+        {order && <p style={{ color: '#888', fontSize: 14 }}>{order.service} · {order.photos} photos</p>}
+        <div style={{ display: 'flex', gap: 24, marginTop: 20, flexWrap: 'wrap' }}>
+          {order && (
+            <div style={{ background: '#161616', padding: '12px 20px', display: 'flex', gap: 24 }}>
+              <div>
+                <div style={{ color: '#555', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Status</div>
+                <div style={{ color: STATUS_COLOR[order.status] || '#888', fontSize: 13, fontWeight: 500 }}>{STATUS_LABEL[order.status] || order.status}</div>
+              </div>
+              <div>
+                <div style={{ color: '#555', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Files</div>
+                <div style={{ color: '#F0EDE8', fontSize: 13, fontWeight: 500 }}>{files.length} photos</div>
+              </div>
+              {expiresIn !== null && (
+                <div>
+                  <div style={{ color: '#555', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Link expires</div>
+                  <div style={{ color: expiresIn <= 2 ? '#E07070' : '#F0EDE8', fontSize: 13, fontWeight: 500 }}>{expiresIn} day{expiresIn !== 1 ? 's' : ''}</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {files.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '80px 0', color: '#555' }}>
+          <div style={{ fontSize: 48, marginBottom: 16 }}>📂</div>
+          <div style={{ fontSize: 14 }}>Files are being prepared. Check back soon.</div>
+        </div>
+      ) : (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div style={{ color: '#888', fontSize: 13 }}>{files.length} file{files.length !== 1 ? 's' : ''} ready to download</div>
+            <a href={files.length === 1 ? files[0].url : '#'} download={files.length === 1} onClick={files.length > 1 ? (e) => { e.preventDefault(); files.forEach((f,i) => { setTimeout(() => { const a = document.createElement('a'); a.href = f.url; a.download = f.name || `prime-touch-${i+1}`; a.click(); }, i * 300); }); } : undefined}>
+              <button className="btn-gold">Download all ({files.length})</button>
+            </a>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 2 }}>
+            {files.map((file, i) => (
+              <div key={i} style={{ position: 'relative', background: '#161616', aspectRatio: '1', overflow: 'hidden', cursor: 'pointer', group: true }}
+                   onMouseEnter={e => e.currentTarget.querySelector('.overlay').style.opacity = '1'}
+                   onMouseLeave={e => e.currentTarget.querySelector('.overlay').style.opacity = '0'}>
+                {isImage(file.url) ? (
+                  <img src={file.url} alt={file.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onClick={() => setPreviewing(file.url)} />
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 8 }}>
+                    <div style={{ fontSize: 32 }}>📄</div>
+                    <div style={{ color: '#888', fontSize: 12 }}>{file.name || `File ${i+1}`}</div>
+                  </div>
+                )}
+                <div className="overlay" style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.75)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: 0, transition: 'opacity 0.2s' }}>
+                  {isImage(file.url) && <button onClick={() => setPreviewing(file.url)} style={{ background: 'none', border: '1px solid rgba(240,237,232,0.4)', color: '#F0EDE8', padding: '8px 16px', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer' }}>Preview</button>}
+                  <a href={file.url} download={file.name || true} onClick={e => e.stopPropagation()} style={{ textDecoration: 'none' }}>
+                    <button style={{ background: '#C9A96E', border: 'none', color: '#0D0D0D', padding: '8px 16px', fontSize: 12, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', fontWeight: 500 }}>Download</button>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+          {order && order.notes && (
+            <div style={{ marginTop: 40, padding: '24px', background: '#161616', borderLeft: '2px solid #C9A96E' }}>
+              <div style={{ color: '#C9A96E', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>Note from Prime Touch</div>
+              <p style={{ color: '#888', fontSize: 14, lineHeight: 1.7 }}>{order.notes}</p>
+            </div>
+          )}
+        </>
+      )}
+      <div style={{ marginTop: 60, paddingTop: 32, borderTop: '1px solid #1a1a1a', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ color: '#444', fontSize: 12 }}>© Prime Touch — Professional Photo Retouching</div>
+        <div style={{ color: '#444', fontSize: 12 }}>Need revisions? Reply to your delivery email.</div>
+      </div>
+    </div>
+  );
+}
+
+function LoginView() {
+  const [step, setStep] = React.useState('email');
+  const [email, setEmail] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [client, setClient] = React.useState(null);
+  const [orders, setOrders] = React.useState([]);
+  const [deliveries, setDeliveries] = React.useState([]);
+
+  async function handleLogin() {
+    if (!email.trim()) return;
+    setLoading(true); setError('');
+    const existing = await db.getClientByEmail(email.trim().toLowerCase());
+    if (existing) {
+      setClient(existing);
+      const ords = await db.getClientOrders(email.trim().toLowerCase());
+      setOrders(ords);
+      if (ords.length) {
+        const dels = await db.getDeliveriesByOrderIds(ords.map(o => o.id));
+        setDeliveries(dels);
+      }
+      setStep('dashboard');
+    } else {
+      setStep('register');
+    }
+    setLoading(false);
+  }
+
+  async function handleRegister() {
+    if (!name.trim()) return;
+    setLoading(true); setError('');
+    const ok = await db.registerClient(email.trim().toLowerCase(), name.trim());
+    if (ok) {
+      setClient({ email, name });
+      setOrders([]);
+      setStep('dashboard');
+    } else {
+      setError('Could not create account. Please try again.');
+    }
+    setLoading(false);
+  }
+
+  function getDeliveryForOrder(orderId) {
+    return deliveries.find(d => d.order_id === orderId);
+  }
+
+  const STATUS_LABEL = { new: 'New', in_progress: 'In progress', review: 'Under review', done: 'Completed', delivered: 'Delivered' };
+  const STATUS_COLOR = { new: '#555', in_progress: '#C9A96E', review: '#7EB8D4', done: '#6DBE8C', delivered: '#6DBE8C' };
+
+  if (step === 'email') return (
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+      <div style={{ maxWidth: 400, width: '100%' }}>
+        <div style={{ color: '#C9A96E', fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 12 }}>Client portal</div>
+        <h1 style={{ fontFamily: 'Playfair Display', fontSize: 32, fontWeight: 400, marginBottom: 12 }}>Welcome back</h1>
+        <p style={{ color: '#888', fontSize: 14, lineHeight: 1.6, marginBottom: 32 }}>Sign in with the email address you used when placing your order.</p>
+        {error && <div style={{ background: 'rgba(220,60,60,0.1)', border: '1px solid rgba(220,60,60,0.3)', color: '#E07070', padding: '12px 16px', fontSize: 13, marginBottom: 16 }}>{error}</div>}
+        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Your email address" type="email" onKeyDown={e => e.key === 'Enter' && handleLogin()} style={{ marginBottom: 12 }} />
+        <button className="btn-gold" onClick={handleLogin} disabled={loading} style={{ width: '100%' }}>
+          {loading ? 'Checking...' : 'Continue'}
+        </button>
+      </div>
+    </div>
+  );
+
+  if (step === 'register') return (
+    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40 }}>
+      <div style={{ maxWidth: 400, width: '100%' }}>
+        <div style={{ color: '#C9A96E', fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 12 }}>New client</div>
+        <h1 style={{ fontFamily: 'Playfair Display', fontSize: 32, fontWeight: 400, marginBottom: 12 }}>Create your account</h1>
+        <p style={{ color: '#888', fontSize: 14, lineHeight: 1.6, marginBottom: 32 }}>This email doesn't have an account yet. Enter your name to get started.</p>
+        {error && <div style={{ background: 'rgba(220,60,60,0.1)', border: '1px solid rgba(220,60,60,0.3)', color: '#E07070', padding: '12px 16px', fontSize: 13, marginBottom: 16 }}>{error}</div>}
+        <input value={email} disabled style={{ marginBottom: 8, opacity: 0.5 }} />
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" onKeyDown={e => e.key === 'Enter' && handleRegister()} style={{ marginBottom: 12 }} />
+        <button className="btn-gold" onClick={handleRegister} disabled={loading} style={{ width: '100%', marginBottom: 12 }}>
+          {loading ? 'Creating...' : 'Create account'}
+        </button>
+        <button onClick={() => setStep('email')} style={{ background: 'none', border: 'none', color: '#555', fontSize: 13, cursor: 'pointer', width: '100%' }}>← Back</button>
+      </div>
+    </div>
+  );
+
+  if (step === 'dashboard') return (
+    <div style={{ maxWidth: 860, margin: '0 auto', padding: '48px 40px' }}>
+      <div style={{ marginBottom: 40, paddingBottom: 32, borderBottom: '1px solid #1a1a1a', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ color: '#C9A96E', fontSize: 11, letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 8 }}>Client portal</div>
+          <h1 style={{ fontFamily: 'Playfair Display', fontSize: 36, fontWeight: 400 }}>Hello, {client.name || client.email}</h1>
+        </div>
+        <button onClick={() => { setStep('email'); setClient(null); setOrders([]); }} style={{ background: 'none', border: '1px solid #2a2a2a', color: '#888', padding: '8px 16px', fontSize: 12, cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Sign out</button>
+      </div>
+
+      {orders.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: '80px 0' }}>
+          <div style={{ color: '#444', fontSize: 14, marginBottom: 8 }}>No orders found for this email.</div>
+          <div style={{ color: '#333', fontSize: 13 }}>If you placed an order recently, it may not be in the system yet. Contact us for help.</div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {orders.map(order => {
+            const del = getDeliveryForOrder(order.id);
+            const hasFiles = del && del.files && del.files.length > 0;
+            return (
+              <div key={order.id} style={{ background: '#111', padding: '20px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 20, flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <div style={{ fontWeight: 500, fontSize: 15, marginBottom: 4 }}>{order.service}</div>
+                  <div style={{ color: '#555', fontSize: 13 }}>#{order.id.slice(0,8).toUpperCase()} · {order.photos} photos</div>
+                </div>
+                <div style={{ display: 'flex', gap: 24, alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div>
+                    <div style={{ color: '#444', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Status</div>
+                    <div style={{ color: STATUS_COLOR[order.status] || '#888', fontSize: 13, fontWeight: 500 }}>{STATUS_LABEL[order.status] || order.status}</div>
+                  </div>
+                  {order.price > 0 && (
+                    <div>
+                      <div style={{ color: '#444', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Total</div>
+                      <div style={{ color: '#F0EDE8', fontSize: 13, fontWeight: 500 }}>${order.price}</div>
+                    </div>
+                  )}
+                  {hasFiles ? (
+                    <a href={`?token=${del.token}`} style={{ textDecoration: 'none' }}>
+                      <button className="btn-gold" style={{ fontSize: 12, padding: '9px 20px' }}>View files ({del.files.length})</button>
+                    </a>
+                  ) : (
+                    <button disabled style={{ background: '#1a1a1a', border: '1px solid #2a2a2a', color: '#444', padding: '9px 20px', fontSize: 12, cursor: 'not-allowed', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                      {order.status === 'delivered' ? 'No files yet' : 'In progress'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <div style={{ marginTop: 60, paddingTop: 32, borderTop: '1px solid #1a1a1a', color: '#333', fontSize: 12 }}>
+        © Prime Touch — Professional Photo Retouching
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [mode, setMode] = React.useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('token') ? 'token' : 'token';
+  });
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Nav mode={mode} onSwitchMode={setMode} />
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        {mode === 'token' ? <TokenView /> : <LoginView />}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
+</body>
+</html>
