@@ -485,13 +485,13 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
       </div>
       <div class="reveal">
         <div class="form-row">
-          <div class="form-group"><label data-en="Full name" data-vi="Họ và tên">Full name</label><input type="text" placeholder="Jane Doe"></div>
-          <div class="form-group"><label data-en="Phone / WhatsApp" data-vi="Số điện thoại">Phone / WhatsApp</label><input type="tel" placeholder="+1 555 123 4567"></div>
+          <div class="form-group"><label data-en="Full name" data-vi="Họ và tên">Full name</label><input id="f-name" type="text" placeholder="Jane Doe"></div>
+          <div class="form-group"><label data-en="Phone / WhatsApp" data-vi="Số điện thoại">Phone / WhatsApp</label><input id="f-phone" type="tel" placeholder="+1 555 123 4567"></div>
         </div>
-        <div class="form-group"><label data-en="Email" data-vi="Email">Email</label><input type="email" placeholder="email@example.com"></div>
+        <div class="form-group"><label data-en="Email" data-vi="Email">Email</label><input id="f-email" type="email" placeholder="email@example.com"></div>
         <div class="form-group">
           <label data-en="Service type" data-vi="Loại dịch vụ">Service type</label>
-          <select>
+          <select id="f-service">
             <option value="" data-en="Select a service..." data-vi="Chọn dịch vụ...">Select a service...</option>
             <option data-en="Portrait retouching" data-vi="Portrait retouching">Portrait retouching</option>
             <option data-en="Product photography" data-vi="Product photography">Product photography</option>
@@ -502,10 +502,10 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
           </select>
         </div>
         <div class="form-row">
-          <div class="form-group"><label data-en="Number of photos" data-vi="Số lượng ảnh">Number of photos</label><input type="number" placeholder="e.g. 20"></div>
-          <div class="form-group"><label data-en="Preferred deadline" data-vi="Deadline mong muốn">Preferred deadline</label><input type="date"></div>
+          <div class="form-group"><label data-en="Number of photos" data-vi="Số lượng ảnh">Number of photos</label><input id="f-photos" type="number" placeholder="e.g. 20"></div>
+          <div class="form-group"><label data-en="Preferred deadline" data-vi="Deadline mong muốn">Preferred deadline</label><input id="f-deadline" type="date"></div>
         </div>
-        <div class="form-group"><label data-en="Project details" data-vi="Mô tả yêu cầu">Project details</label><textarea placeholder="Describe the style, color tone you're after, or paste a reference link..." data-en-ph="Describe the style, color tone you're after, or paste a reference link..." data-vi-ph="Mô tả chi tiết phong cách, tone màu mong muốn, hoặc đính kèm link tham khảo..."></textarea></div>
+        <div class="form-group"><label data-en="Project details" data-vi="Mô tả yêu cầu">Project details</label><textarea id="f-message" placeholder="Describe the style, color tone you're after, or paste a reference link..." data-en-ph="Describe the style, color tone you're after, or paste a reference link..." data-vi-ph="Mô tả chi tiết phong cách, tone màu mong muốn, hoặc đính kèm link tham khảo..."></textarea></div>
         <button class="btn-submit" onclick="handleSubmit()" data-en="Send quote request" data-vi="Gửi yêu cầu báo giá">Send quote request</button>
         <p class="form-note" data-en="I'll get back to you within 2 business hours" data-vi="Mình sẽ phản hồi trong vòng 2 giờ làm việc">I'll get back to you within 2 business hours</p>
       </div>
