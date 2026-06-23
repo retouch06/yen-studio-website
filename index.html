@@ -103,19 +103,11 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .portfolio-filters{display:flex;gap:8px;margin-bottom:48px;flex-wrap:wrap}
 .filter-btn{padding:8px 20px;border-radius:100px;border:1px solid var(--border);background:none;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
 .filter-btn.active,.filter-btn:hover{border-color:var(--gold);color:var(--gold)}
-.portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
-@media(max-width:700px){.portfolio-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:480px){.portfolio-grid{grid-template-columns:1fr}}
+.portfolio-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;max-width:900px}
+@media(max-width:600px){.portfolio-grid{grid-template-columns:1fr}}
 .portfolio-item{aspect-ratio:4/5;background:var(--bg3);border-radius:6px;overflow:hidden;position:relative;cursor:pointer}
 .portfolio-item:nth-child(1){grid-row:span 2;aspect-ratio:auto}
-.portfolio-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--border);transition:all .3s;position:relative;overflow:hidden}
-.portfolio-placeholder::before{content:'';position:absolute;inset:0}
-.pi-1::before{background:linear-gradient(160deg,#1a0f0a,#2d1810,#1a0f0a)}
-.pi-2::before{background:linear-gradient(160deg,#0a0f1a,#102028,#0a0f1a)}
-.pi-3::before{background:linear-gradient(160deg,#100a1a,#1e1028,#100a1a)}
-.pi-4::before{background:linear-gradient(160deg,#0a1a0f,#102018,#0a1a0f)}
-.pi-5::before{background:linear-gradient(160deg,#1a1510,#2a2018,#1a1510)}
-.pi-6::before{background:linear-gradient(160deg,#0f0a1a,#181028,#0f0a1a)}
+
 .portfolio-item:hover .portfolio-overlay{opacity:1}
 .portfolio-overlay{position:absolute;inset:0;background:rgba(13,13,13,.7);opacity:0;transition:opacity .3s;display:flex;align-items:flex-end;padding:24px;z-index:1}
 .portfolio-meta{color:var(--text)}
@@ -345,35 +337,21 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
   <p class="section-eyebrow reveal" data-en="Work" data-vi="Tác phẩm">Work</p>
   <h2 class="section-title reveal" data-en="Selected portfolio" data-vi="Portfolio nổi bật">Selected portfolio</h2>
   <div class="portfolio-filters reveal">
-    <button class="filter-btn active" onclick="filterPortfolio('all',this)" data-en="All" data-vi="Tất cả">All</button>
-    <button class="filter-btn" onclick="filterPortfolio('portrait',this)" data-en="Portrait" data-vi="Portrait">Portrait</button>
+    <button class="filter-btn active" onclick="filterPortfolio('all',this)" data-en="All work" data-vi="Tất cả">All work</button>
     <button class="filter-btn" onclick="filterPortfolio('product',this)" data-en="Product" data-vi="Product">Product</button>
-    <button class="filter-btn" onclick="filterPortfolio('fashion',this)" data-en="Fashion" data-vi="Fashion">Fashion</button>
   </div>
   <div class="portfolio-grid reveal" id="portfolioGrid">
-    <div class="portfolio-item" data-cat="portrait">
-      <div class="portfolio-placeholder pi-1"></div>
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Portrait" data-vi="Portrait">Portrait</p><p class="portfolio-title" data-en="Natural skin retouching" data-vi="Natural skin retouching">Natural skin retouching</p></div></div>
-    </div>
     <div class="portfolio-item" data-cat="product">
-      <div class="portfolio-placeholder pi-2"></div>
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Skincare campaign" data-vi="Skincare campaign">Skincare campaign</p></div></div>
-    </div>
-    <div class="portfolio-item" data-cat="fashion">
-      <div class="portfolio-placeholder pi-3"></div>
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Fashion" data-vi="Fashion">Fashion</p><p class="portfolio-title" data-en="Editorial lookbook" data-vi="Editorial lookbook">Editorial lookbook</p></div></div>
-    </div>
-    <div class="portfolio-item" data-cat="fashion">
-      <img src="images/tuiafter.jpg" alt="Jewelry collection retouch" style="width:100%;height:100%;object-fit:cover">
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Fashion" data-vi="Fashion">Fashion</p><p class="portfolio-title" data-en="Studio/E-commerce" data-vi="Studio/E-commerce">Studio/E-commerce</p></div></div>
+      <img src="images/tuiafter.jpg" alt="Studio E-commerce retouch" style="width:100%;height:100%;object-fit:cover">
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Studio / E-commerce" data-vi="Studio / E-commerce">Studio / E-commerce</p></div></div>
     </div>
     <div class="portfolio-item" data-cat="product">
       <img src="images/tamafter.jpg" alt="Jewelry collection retouch" style="width:100%;height:100%;object-fit:cover">
       <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Jewelry collection" data-vi="Jewelry collection">Jewelry collection</p></div></div>
     </div>
-    <div class="portfolio-item" data-cat="portrait">
-      <div class="portfolio-placeholder pi-6"></div>
-      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Portrait" data-vi="Portrait">Portrait</p><p class="portfolio-title" data-en="Corporate headshots" data-vi="Corporate headshots">Corporate headshots</p></div></div>
+    <div class="portfolio-item" data-cat="product">
+      <img src="images/tambefore.jpg" alt="Skincare product" style="width:100%;height:100%;object-fit:cover">
+      <div class="portfolio-overlay"><div class="portfolio-meta"><p class="portfolio-cat" data-en="Product" data-vi="Product">Product</p><p class="portfolio-title" data-en="Skincare campaign" data-vi="Skincare campaign">Skincare campaign</p></div></div>
     </div>
   </div>
 </section>
