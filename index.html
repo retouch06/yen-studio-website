@@ -125,8 +125,8 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 /* Modal BA slider */
 .modal-ba{position:relative;width:100%;aspect-ratio:3/2;overflow:hidden;cursor:ew-resize;user-select:none;border-radius:8px}
 .modal-ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.modal-ba-after{position:absolute;inset:0;overflow:hidden;width:50%}
-.modal-ba-after img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;max-width:none}
+.modal-ba-after{position:absolute;top:0;left:0;bottom:0;overflow:hidden;width:50%}
+.modal-ba-after img{position:absolute;top:0;left:0;height:100%;width:auto;max-width:none;object-fit:none}
 .modal-ba-line{position:absolute;top:0;bottom:0;left:50%;width:2px;background:#C9A96E;transform:translateX(-50%);pointer-events:none}
 .modal-ba-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;background:#C9A96E;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 2px 12px rgba(0,0,0,.5)}
 .modal-ba-handle svg{width:18px;height:18px;fill:#0D0D0D}
@@ -346,10 +346,10 @@ footer{padding:40px 48px;border-top:1px solid var(--border);display:flex;align-i
 <section class="slider-section">
   <div style="text-align:center;font-family:'Playfair Display',serif;letter-spacing:.2em;color:var(--gold);margin-bottom:24px;font-size:14px;text-transform:uppercase;">BEFORE / AFTER</div>
   <div class="ba-container reveal" id="baContainer">
-    <img class="ba-img" src="images/tambefore.jpg" alt="Original unedited photo">
+    <img class="ba-img" src="images/portfolio/accessories/acc-2-before.jpg" alt="Original unedited photo" style="width:100%;height:100%;object-fit:cover">
     <div class="ba-after" id="baAfter">
-      <div style="position:absolute;inset:0">
-        <img src="images/tamafter.jpg" alt="Retouched photo" style="position:absolute;top:0;left:0;width:820px;max-width:none;height:100%;object-fit:cover">
+      <div style="position:absolute;inset:0;overflow:hidden">
+        <img src="images/portfolio/accessories/acc-2-after.jpg" alt="Retouched photo" id="baAfterImg" style="position:absolute;top:0;left:0;height:100%;width:820px;max-width:none;object-fit:cover">
       </div>
     </div>
     <div class="ba-tag before" data-en="Before" data-vi="Trước">Before</div>
@@ -670,7 +670,7 @@ function setPct(x){
   ba.style.width=p+'%';
   if(bd)bd.style.left=p+'%';
   const img=ba.querySelector('img');
-  if(img)img.style.width=r.width+'px';
+  if(img){img.style.width=r.width+'px';img.style.maxWidth='none';}
 }
 setPct({clientX:bc.getBoundingClientRect().left+bc.getBoundingClientRect().width/2});
 bc.addEventListener('mousedown',e=>{dragging=true;setPct(e.clientX)});
@@ -774,8 +774,18 @@ function openModal(el) {
   const modal = document.getElementById('baModal');
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
-  // Reset slider to 50%
-  setTimeout(() => setModalPct(50), 50);
+  setTimeout(() => {
+    const ba = document.getElementById('modalBA');
+    const w = ba.getBoundingClientRect().width;
+    const afterImg = document.getElementById('modalAfterImg');
+    const beforeImg = document.getElementById('modalBefore');
+    afterImg.style.width = w + 'px';
+    afterImg.style.maxWidth = 'none';
+    beforeImg.style.width = '100%';
+    beforeImg.style.height = '100%';
+    beforeImg.style.objectFit = 'cover';
+    setModalPct(50);
+  }, 80);
 }
 function closeModal(e) {
   if (e.target === document.getElementById('baModal')) closeModalDirect();
@@ -786,7 +796,15 @@ function closeModalDirect() {
 }
 function setModalPct(pct) {
   pct = Math.max(5, Math.min(95, pct));
-  document.getElementById('modalAfter').style.width = pct + '%';
+  const ba = document.getElementById('modalBA');
+  const w = ba ? ba.getBoundingClientRect().width : 800;
+  const afterEl = document.getElementById('modalAfter');
+  const afterImg = document.getElementById('modalAfterImg');
+  afterEl.style.width = pct + '%';
+  if (afterImg) {
+    afterImg.style.width = w + 'px';
+    afterImg.style.maxWidth = 'none';
+  }
   document.getElementById('modalLine').style.left = pct + '%';
   document.getElementById('modalHandle').style.left = pct + '%';
 }
