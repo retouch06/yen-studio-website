@@ -160,12 +160,11 @@ nav.scrolled{background:rgba(13,13,13,.92);backdrop-filter:blur(12px);border-col
 .portfolio-filters{display:flex;gap:8px;margin-bottom:48px;flex-wrap:wrap}
 .filter-btn{padding:8px 20px;border-radius:100px;border:1px solid var(--border);background:none;color:var(--muted);font-size:13px;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
 .filter-btn.active,.filter-btn:hover{border-color:var(--gold);color:var(--gold)}
-.portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-width:1100px}
+.portfolio-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-width:1100px}
 @media(max-width:700px){.portfolio-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:420px){.portfolio-grid{grid-template-columns:1fr}}
 .portfolio-item{aspect-ratio:3/4;background:var(--bg3);border-radius:8px;overflow:hidden;position:relative;cursor:pointer;transition:transform .2s}
 .portfolio-item:hover{transform:scale(1.01)}
-.portfolio-item:nth-child(1){grid-row:span 1;aspect-ratio:3/4}
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:200;display:flex;align-items:center;justify-content:center;padding:40px 20px;opacity:0;pointer-events:none;transition:opacity .3s}
 .modal-overlay.open{opacity:1;pointer-events:all}
