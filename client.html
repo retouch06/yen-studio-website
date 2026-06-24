@@ -129,7 +129,7 @@ const STATUS_COLOR = { new: '#555', in_progress: '#C9A96E', review: '#7EB8D4', d
 function Nav({ mode, onSwitchMode }) {
   return (
     <nav style={{ padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #1a1a1a' }}>
-      <div className="logo" style={{color:'#F0EDE8'}}>Prime Touch</div>
+      <a href="/" style={{textDecoration:'none'}}><div className="logo" style={{color:'#F0EDE8'}}>Prime Touch</div></a>
       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
         {mode === 'token' && (
           <button className="btn-outline" onClick={() => onSwitchMode('login')} style={{ fontSize: 12, padding: '8px 18px' }}>
